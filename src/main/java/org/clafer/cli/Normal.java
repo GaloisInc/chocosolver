@@ -39,6 +39,7 @@ public class Normal {
 
         int index = 0; // instance id
         boolean prettify = options.has("prettify");
+        boolean sysml = options.has("sysml");
         boolean printOff = options.has("noprint");
         boolean dataTackingOn = options.has("dataFile");
         boolean timeOn = options.has("time");
@@ -71,28 +72,34 @@ public class Normal {
             if (printOff) {
                 ++index;
             } else {
-                outStream.println("=== Instance " + (++index) + " Begin ===\n");
-                InstanceModel instance = solver.instance();
-                if (prettify)
-                    instance.print(outStream);
-                else
-                    for (InstanceClafer c : instance.getTopClafers())
-                        Utils.printClafer(c, outStream);
-                outStream.println("\n--- Instance " + (index) + " End ---\n");
+                if (sysml) {
+                    InstanceModel instance = solver.instance();
+                    instance.printSysml(outStream);
+                } else {
+                    outStream.println("=== Instance " + (++index) + " Begin ===\n");
+                    InstanceModel instance = solver.instance();
+                    if (prettify)
+                        instance.print(outStream);
+                    else
+                        for (InstanceClafer c : instance.getTopClafers())
+                            Utils.printClafer(c, outStream);
+                    outStream.println("\n--- Instance " + (index) + " End ---\n");
+                }
             }
         }
-        if (timeOn) {
-            elapsedTime = (double) (System.nanoTime() - startTime) / 1000000000;
-            if (objectives.length == 0)
-                System.out.println("Generated " +                           index + " instance(s) within the scope in " + elapsedTime + " seconds\n");
-            else
-                System.out.println("Generated " + (n == -1 ? "all " : "") + index + " optimal instance(s) within the scope in " + elapsedTime + " secondse\n");
-        } else {
-            if (objectives.length == 0)
-                System.out.println("Generated " +                           index + " instance(s) within the scope\n");
-            else
-                System.out.println("Generated " + (n == -1 ? "all " : "") + index + " optimal instance(s) within the scope\n");
+        if (!sysml) {
+            if (timeOn) {
+                elapsedTime = (double) (System.nanoTime() - startTime) / 1000000000;
+                if (objectives.length == 0)
+                    System.out.println("Generated " +                           index + " instance(s) within the scope in " + elapsedTime + " seconds\n");
+                else
+                    System.out.println("Generated " + (n == -1 ? "all " : "") + index + " optimal instance(s) within the scope in " + elapsedTime + " secondse\n");
+            } else {
+                if (objectives.length == 0)
+                    System.out.println("Generated " +                           index + " instance(s) within the scope\n");
+                else
+                    System.out.println("Generated " + (n == -1 ? "all " : "") + index + " optimal instance(s) within the scope\n");
+            }
         }
-
     }
 }

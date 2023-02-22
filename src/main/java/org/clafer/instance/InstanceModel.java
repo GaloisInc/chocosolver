@@ -50,6 +50,21 @@ public class InstanceModel {
     }
 
     /**
+     * Print solution as SysMLv2
+     *
+     * This is the start of exploring an automated product derivation tool
+     * and the requirements around inferring a system model from clafer are
+     * still tbd
+     * @param out
+     * @throws IOException
+     */
+    public void printSysml(Appendable out) throws IOException {
+        for (InstanceClafer top : topClafers) {
+            top.print(out);
+        }
+    }
+
+    /**
      * Print solution to stdout.
      *
      * @throws IOException an IO error occurred

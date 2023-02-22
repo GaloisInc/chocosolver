@@ -27,6 +27,7 @@ public class Main
                 accepts( "noprint", "Don't print the instances to the console or a file");
                 accepts( "output", "Output instances to the given file." ).withRequiredArg().ofType( File.class ).describedAs( "text file" );
                 accepts( "prettify", "Use simple and pretty output format (not formal)." );
+                accepts( "sysml", "Print the instances as SysMLv2" );
                 accepts( "repl", "Run in REPL (interactive) mode." );
                 accepts( "scope", "Override the default global scope value." ).withRequiredArg().ofType( Integer.class );
                 accepts( "search", "PreferSmallerInstances/PreferLargerInstances/Random" ).withRequiredArg().ofType( ClaferSearchStrategy.class );
