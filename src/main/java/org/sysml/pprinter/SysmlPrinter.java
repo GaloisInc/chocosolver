@@ -39,8 +39,16 @@ public class SysmlPrinter implements SysmlExprVisitor<String, Void> {
                     .append(ast.getPropertyType().getName())
                     .append(" ")
                     .append(ast.getName())
-                    .append(";\n")
             ;
+            if (ast.getElements().length > 0) {
+                this.out.append("{\n");
+                for (SysmlBlockDefElement elem : ast.getElements()) {
+                    elem.accept(this, indent + indent_base);
+                }
+                this.out.append(indent).append("}\n");
+            } else {
+                this.out.append(";\n");
+            }
         } catch (IOException ignored) {
 
         }

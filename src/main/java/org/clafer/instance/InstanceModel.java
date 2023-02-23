@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.clafer.ast.AstClafer;
 import org.clafer.ast.AstConcreteClafer;
 import org.clafer.common.Check;
 import org.sysml.*;
@@ -51,6 +53,15 @@ public class InstanceModel {
         return typedTopClafer;
     }
 
+    private SysmlProperty compileInstance(InstanceClafer model) {
+        String propertyName = model.getType().getName();
+        ArrayList<SysmlBlockDefElement> children = new ArrayList<SysmlBlockDefElement>();
+        for (InstanceClafer child : model.getChildren()) {
+            children.add(compileInstance(child));
+        }
+        return new SysmlProperty(new SysmlBlockVisibility(SysmlVisibilityOption.PLUS), new SysmlPropertyType("part"), propertyName, children.toArray(new SysmlBlockDefElement[children.size()]));
+    }
+
     /**
      * Print solution as SysMLv2
      *
@@ -61,16 +72,11 @@ public class InstanceModel {
      * @throws IOException
      */
     public void printSysml(Appendable out) throws IOException {
-        ArrayList<SysmlBlockDefElement> elems = new ArrayList<SysmlBlockDefElement>();
-        ArrayList<SysmlBlockDefElement> elems_inner = new ArrayList<SysmlBlockDefElement>();
-        elems.add(new SysmlPackage("inner", elems_inner));
-        elems.add(new SysmlProperty(new SysmlBlockVisibility(SysmlVisibilityOption.PLUS), new SysmlPropertyType("part"), "thing"));
-        SysmlPackage pack = new SysmlPackage("outer", elems);
-        SysmlPrinter pprinter = new SysmlPrinter(out);
-        pprinter.visit(pack, "");
-        //for (InstanceClafer top : topClafers) {
-        //    top.printSysml(out);
-        //}
+        for (InstanceClafer top : topClafers) {
+            SysmlPrinter pprinter = new SysmlPrinter(out);
+            SysmlProperty model = compileInstance(top);
+            pprinter.visit(model, "");
+        }
     }
 
     /**

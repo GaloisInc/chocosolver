@@ -8,11 +8,11 @@ import java.util.ArrayList;
 /**
  * TODO: build out the DiagramElement taxonomy better
  */
-public class SysmlPackage implements SysmlId, SysmlBlockDefElement, SysmlExpr {
-    private final ArrayList<SysmlBlockDefElement> elements;
+public class SysmlPackage implements SysmlBlockDefElement {
+    private final SysmlBlockDefElement[] elements;
     private final String name;
 
-    public SysmlPackage(String name, ArrayList<SysmlBlockDefElement> elements){
+    public SysmlPackage(String name, SysmlBlockDefElement[] elements){
         this.elements = elements;
         this.name = name;
     }
@@ -21,7 +21,7 @@ public class SysmlPackage implements SysmlId, SysmlBlockDefElement, SysmlExpr {
         return name;
     }
 
-    public ArrayList<SysmlBlockDefElement> getElements(){
+    public SysmlBlockDefElement[] getElements(){
         return elements;
     }
 
