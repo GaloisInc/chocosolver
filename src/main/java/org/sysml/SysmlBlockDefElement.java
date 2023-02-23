@@ -1,4 +1,4 @@
 package org.sysml;
 
-public interface SysmlBlockDefElement {
+public interface SysmlBlockDefElement extends SysmlExpr {
 }

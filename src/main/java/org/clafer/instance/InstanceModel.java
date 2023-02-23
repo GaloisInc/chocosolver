@@ -7,6 +7,7 @@ import java.util.List;
 import org.clafer.ast.AstConcreteClafer;
 import org.clafer.common.Check;
 import org.sysml.*;
+import org.sysml.pprinter.SysmlPrinter;
 
 /**
  *
@@ -65,9 +66,11 @@ public class InstanceModel {
         elems.add(new SysmlPackage("inner", elems_inner));
         elems.add(new SysmlProperty(new SysmlBlockVisibility(SysmlVisibilityOption.PLUS), new SysmlPropertyType("part"), "thing"));
         SysmlPackage pack = new SysmlPackage("outer", elems);
-        for (InstanceClafer top : topClafers) {
-            top.print(out);
-        }
+        SysmlPrinter pprinter = new SysmlPrinter(out);
+        pprinter.visit(pack, "");
+        //for (InstanceClafer top : topClafers) {
+        //    top.printSysml(out);
+        //}
     }
 
     /**
