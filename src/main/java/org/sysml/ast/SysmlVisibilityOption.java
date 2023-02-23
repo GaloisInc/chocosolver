@@ -1,4 +1,4 @@
-package org.sysml;
+package org.sysml.ast;
 
 public enum SysmlVisibilityOption {
     PLUS, // namespace-visibility

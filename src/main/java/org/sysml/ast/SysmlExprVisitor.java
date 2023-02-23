@@ -1,6 +1,4 @@
-package org.sysml;
-
-import org.clafer.ast.AstThis;
+package org.sysml.ast;
 
 import java.io.IOException;
 

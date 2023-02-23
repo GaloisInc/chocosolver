@@ -1,4 +1,4 @@
-package org.sysml;
+package org.sysml.ast;
 
 /**
  * Sysml Block Visibility

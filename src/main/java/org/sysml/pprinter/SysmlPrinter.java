@@ -1,9 +1,9 @@
 package org.sysml.pprinter;
 
-import org.sysml.SysmlBlockDefElement;
-import org.sysml.SysmlExprVisitor;
-import org.sysml.SysmlPackage;
-import org.sysml.SysmlProperty;
+import org.sysml.ast.SysmlBlockDefElement;
+import org.sysml.ast.SysmlExprVisitor;
+import org.sysml.ast.SysmlPackage;
+import org.sysml.ast.SysmlProperty;
 
 import java.io.IOException;
 import java.lang.Void;

@@ -1,9 +1,8 @@
-package org.sysml;
+package org.sysml.ast;
 
 
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * TODO: build out the DiagramElement taxonomy better

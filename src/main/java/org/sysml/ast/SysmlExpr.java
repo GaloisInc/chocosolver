@@ -1,4 +1,4 @@
-package org.sysml;
+package org.sysml.ast;
 
 import java.io.IOException;
 

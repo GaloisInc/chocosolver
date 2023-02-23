@@ -1,8 +1,6 @@
-package org.sysml;
+package org.sysml.ast;
 
 import org.clafer.common.Check;
-
-import java.util.ArrayList;
 
 /**
  * SysML Property
