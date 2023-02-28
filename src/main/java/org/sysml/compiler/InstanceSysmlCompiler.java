@@ -30,27 +30,12 @@ public class InstanceSysmlCompiler {
         return count;
     }
 
-    ArrayList<String> _getSuperClafers(AstClafer clafer, ArrayList<String> hier){
-        if (clafer.getSuperClafer() == null) {
-            return hier;
-        } else {
-            hier.add(SysmlCompilerUtils.getPropertyId(clafer.getSuperClafer().getName()));
-            return _getSuperClafers(clafer.getSuperClafer(), hier);
-        }
-    }
-
-    public String[] getSuperClafers(AstClafer clafer){
-        ArrayList<String> clafers = _getSuperClafers(clafer, new ArrayList<String>());
-        String[] clafers_arr = new String[clafers.size()];
-        return clafers.toArray(clafers_arr);
-    }
-
     public SysmlProperty compile(InstanceClafer model, InstanceClafer topLevelModel) {
         // collect the identifier
         String propertyName =SysmlCompilerUtils.getPropertyId(model.getType().getName());
 
         // get its supers
-        String[] superClafers = getSuperClafers(model.getType());
+        String[] superClafers = SysmlCompilerUtils.getSuperClafers(model.getType());
         List hierarchy = Arrays.asList(superClafers);
 
         // process the children

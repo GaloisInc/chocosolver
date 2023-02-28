@@ -20,18 +20,6 @@ public class AstSysmlCompiler {
         this.typeMap.put("string", "String");
     }
 
-    public String[] getSuperClafers(AstClafer model){
-        Object spr = model.getSuperClafer();
-        if (spr == null){
-            return new String[0];
-        } else {
-            String[] rem = getSuperClafers((AstClafer) spr);
-            String[] sprs = Arrays.copyOf(rem, rem.length + 1);
-            sprs[0] = SysmlCompilerUtils.getPropertyId(((AstClafer) spr).getName());
-            System.arraycopy(rem, 0, sprs, 1, rem.length);
-            return sprs;
-        }
-    }
     public SysmlPropertyDef[] compile(AstModel model, AstModel topLevelModel) {
         ArrayList<SysmlPropertyDef> propDefs = new ArrayList<SysmlPropertyDef>();
 
@@ -49,7 +37,7 @@ public class AstSysmlCompiler {
                 }
             }
 
-            String[] superClafers = getSuperClafers(child);
+            String[] superClafers = SysmlCompilerUtils.getSuperClafers(child);
             List hierarchy = Arrays.asList(superClafers);
             if (hierarchy.size() < 3){
                 continue;

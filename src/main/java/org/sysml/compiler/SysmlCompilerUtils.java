@@ -1,5 +1,8 @@
 package org.sysml.compiler;
 
+import org.clafer.ast.AstClafer;
+
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,4 +19,16 @@ public class SysmlCompilerUtils {
         }
     }
 
+    public static String[] getSuperClafers(AstClafer model){
+        Object spr = model.getSuperClafer();
+        if (spr == null){
+            return new String[0];
+        } else {
+            String[] rem = getSuperClafers((AstClafer) spr);
+            String[] sprs = Arrays.copyOf(rem, rem.length + 1);
+            sprs[0] = SysmlCompilerUtils.getPropertyId(((AstClafer) spr).getName());
+            System.arraycopy(rem, 0, sprs, 1, rem.length);
+            return sprs;
+        }
+    }
 }
