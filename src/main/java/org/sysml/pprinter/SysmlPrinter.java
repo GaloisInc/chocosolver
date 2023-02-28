@@ -40,8 +40,14 @@ public class SysmlPrinter implements SysmlExprVisitor<String, Void> {
                     .append(" ")
                     .append(ast.getName())
             ;
+            if (ast.getMultiplicity() > 1) {
+                this.out.append("[").append(String.valueOf(ast.getMultiplicity())).append("]");
+            }
+            for (String s: ast.getSupers()){
+                this.out.append(" :> ").append(s);
+            }
             if (ast.getElements().length > 0) {
-                this.out.append("{\n");
+                this.out.append(" {\n");
                 for (SysmlBlockDefElement elem : ast.getElements()) {
                     elem.accept(this, indent + indent_base);
                 }

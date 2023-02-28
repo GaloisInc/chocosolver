@@ -12,21 +12,30 @@ import org.clafer.common.Check;
 public class SysmlProperty implements SysmlBlockDefElement {
 
     private final String name;
+
     private final SysmlPropertyType prop;
 
     private final SysmlBlockDefElement[] elements;
+    private final String[] superTypes;
 
-    public SysmlProperty(SysmlBlockVisibility blockVis, SysmlPropertyType propType, String name, SysmlBlockDefElement[] elements){
+    private int multiplicity;
+
+    public SysmlProperty(SysmlBlockVisibility blockVis, SysmlPropertyType propType, String name, SysmlBlockDefElement[] elements, String[] superTypes, int multiplicity){
         this.name = Check.notNull(name);
         this.prop = propType;
         this.elements = elements;
+        this.superTypes = superTypes;
+        this.multiplicity = multiplicity;
     }
 
     public SysmlProperty(SysmlBlockVisibility blockVis, SysmlPropertyType propType, String name){
         this.name = Check.notNull(name);
         this.prop = propType;
         this.elements = new SysmlBlockDefElement[0];
+        this.superTypes = new String[0];
+        this.multiplicity = 1;
     }
+
     @Override
     public String getName() {
         return name;
@@ -38,6 +47,14 @@ public class SysmlProperty implements SysmlBlockDefElement {
 
     public SysmlBlockDefElement[] getElements() {
         return elements;
+    }
+
+    public String[] getSupers(){
+        return superTypes;
+    }
+
+    public int getMultiplicity(){
+        return multiplicity;
     }
 
     @Override
