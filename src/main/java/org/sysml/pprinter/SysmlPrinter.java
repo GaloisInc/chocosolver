@@ -1,9 +1,6 @@
 package org.sysml.pprinter;
 
-import org.sysml.ast.SysmlBlockDefElement;
-import org.sysml.ast.SysmlExprVisitor;
-import org.sysml.ast.SysmlPackage;
-import org.sysml.ast.SysmlProperty;
+import org.sysml.ast.*;
 
 import java.io.IOException;
 import java.lang.Void;
@@ -31,6 +28,11 @@ public class SysmlPrinter implements SysmlExprVisitor<String, Void> {
     public void print(String indent, SysmlBlockDefElement sprop, Appendable out) throws IOException {
     }
 
+    public Void visit(SysmlAnnotation ast, String indent) throws IOException {
+        this.out.append(indent).append(":>> ").append(ast.getName()).append(" = ").append(ast.getRef()).append(";\n");
+        return null;
+    }
+
     @Override
     public Void visit(SysmlProperty ast, String indent) {
         try {
@@ -46,8 +48,11 @@ public class SysmlPrinter implements SysmlExprVisitor<String, Void> {
             for (String s: ast.getSupers()){
                 this.out.append(" :> ").append(s);
             }
-            if (ast.getElements().length > 0) {
+            if (ast.getElements().length > 0 || ast.getAnnotations().length > 0) {
                 this.out.append(" {\n");
+                for (SysmlAnnotation annot: ast.getAnnotations()){
+                    annot.accept(this, indent + indent_base);
+                }
                 for (SysmlBlockDefElement elem : ast.getElements()) {
                     elem.accept(this, indent + indent_base);
                 }

@@ -16,16 +16,29 @@ public class SysmlProperty implements SysmlBlockDefElement {
     private final SysmlPropertyType prop;
 
     private final SysmlBlockDefElement[] elements;
+
+    private final SysmlAnnotation[] annotations;
     private final String[] superTypes;
 
     private int multiplicity;
 
-    public SysmlProperty(SysmlBlockVisibility blockVis, SysmlPropertyType propType, String name, SysmlBlockDefElement[] elements, String[] superTypes, int multiplicity){
+
+
+    public SysmlProperty(
+            SysmlBlockVisibility blockVis,
+            SysmlPropertyType propType,
+            String name,
+            SysmlBlockDefElement[] elements,
+            SysmlAnnotation[] annotations,
+            String[] superTypes,
+            int multiplicity
+    ){
         this.name = Check.notNull(name);
         this.prop = propType;
         this.elements = elements;
         this.superTypes = superTypes;
         this.multiplicity = multiplicity;
+        this.annotations = annotations;
     }
 
     public SysmlProperty(SysmlBlockVisibility blockVis, SysmlPropertyType propType, String name){
@@ -33,6 +46,7 @@ public class SysmlProperty implements SysmlBlockDefElement {
         this.prop = propType;
         this.elements = new SysmlBlockDefElement[0];
         this.superTypes = new String[0];
+        this.annotations = new SysmlAnnotation[0];
         this.multiplicity = 1;
     }
 
@@ -55,6 +69,10 @@ public class SysmlProperty implements SysmlBlockDefElement {
 
     public int getMultiplicity(){
         return multiplicity;
+    }
+
+    public SysmlAnnotation[] getAnnotations(){
+        return annotations;
     }
 
     @Override
