@@ -1,15 +1,13 @@
 package org.sysml.ast;
 
-import org.clafer.common.Check;
-
 import java.io.IOException;
 
-public class SysmlAnnotation implements SysmlExpr, SysmlId {
+public class SysmlAttribute implements SysmlExpr, SysmlId {
     private String name;
 
     private Object ref;
 
-    public SysmlAnnotation(String name, Object ref) {
+    public SysmlAttribute(String name, Object ref) {
         this.name = name;
         this.ref = ref;
     }

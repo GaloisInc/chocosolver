@@ -88,14 +88,14 @@ public class InstanceSysmlCompiler {
         processedClafers.add(model.getType().getName());
 
         // collect the annotations
-        ArrayList<SysmlAnnotation> annots = new ArrayList<SysmlAnnotation>();
+        ArrayList<SysmlAttribute> annots = new ArrayList<SysmlAttribute>();
         for (InstanceClafer child : model.getChildren()) {
             Object ref = child.getType().getRef();
             if (ref != null) {
                 AstRef aref = (AstRef) ref;
                 String aname = getPropertyId(aref.getSourceType().getName());
                 Object refv = child.getRef();
-                annots.add(new SysmlAnnotation(aname, refv));
+                annots.add(new SysmlAttribute(aname, refv));
             }
         }
 
@@ -105,7 +105,7 @@ public class InstanceSysmlCompiler {
                 new SysmlPropertyType(propName),
                 propertyName,
                 children.toArray(new SysmlBlockDefElement[children.size()]),
-                annots.toArray(new SysmlAnnotation[annots.size()]),
+                annots.toArray(new SysmlAttribute[annots.size()]),
                 superTypes,
                 multiplicity
         );

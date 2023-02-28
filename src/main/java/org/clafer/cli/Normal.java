@@ -12,6 +12,11 @@ import org.clafer.instance.InstanceModel;
 import org.clafer.javascript.JavascriptFile;
 import org.clafer.objective.Objective;
 import org.clafer.scope.Scope;
+import org.clafer.ast.AstModel;
+import org.sysml.ast.SysmlProperty;
+import org.sysml.ast.SysmlPropertyDef;
+import org.sysml.compiler.AstSysmlCompiler;
+import org.sysml.pprinter.SysmlPrinter;
 
 
 public class Normal {
@@ -73,8 +78,19 @@ public class Normal {
                 ++index;
             } else {
                 if (sysml) {
+                    outStream.append("package Architecture {\n");
+                    outStream.append("    import ScalarValues::*;\n");
+                    AstModel top = javascriptFile.getModel();
+                    SysmlPrinter pprinter = new SysmlPrinter(outStream);
+                    AstSysmlCompiler compiler = new AstSysmlCompiler();
+                    SysmlPropertyDef[] models = compiler.compile(top, top);
+                    for (SysmlPropertyDef model: models){
+                        pprinter.visit(model, "    ");
+                    }
+
                     InstanceModel instance = solver.instance();
-                    instance.printSysml(outStream);
+                    instance.printSysml(outStream, "    ");
+                    outStream.append("}\n");
                 } else {
                     outStream.println("=== Instance " + (++index) + " Begin ===\n");
                     InstanceModel instance = solver.instance();

@@ -28,7 +28,7 @@ public class SysmlPrinter implements SysmlExprVisitor<String, Void> {
     public void print(String indent, SysmlBlockDefElement sprop, Appendable out) throws IOException {
     }
 
-    public Void visit(SysmlAnnotation ast, String indent) throws IOException {
+    public Void visit(SysmlAttribute ast, String indent) throws IOException {
         this.out.append(indent).append(":>> ").append(ast.getName()).append(" = ").append(ast.getRef()).append(";\n");
         return null;
     }
@@ -46,12 +46,43 @@ public class SysmlPrinter implements SysmlExprVisitor<String, Void> {
                 this.out.append("[").append(String.valueOf(ast.getMultiplicity())).append("]");
             }
             for (String s: ast.getSupers()){
+                this.out.append(" : ").append(s);
+            }
+            if (ast.getElements().length > 0 || ast.getAnnotations().length > 0) {
+                this.out.append(" {\n");
+                for (SysmlAttribute annot: ast.getAnnotations()){
+                    annot.accept(this, indent + indent_base);
+                }
+                for (SysmlBlockDefElement elem : ast.getElements()) {
+                    elem.accept(this, indent + indent_base);
+                }
+                this.out.append(indent).append("}\n");
+            } else {
+                this.out.append(";\n");
+            }
+        } catch (IOException ignored) {
+
+        }
+        return null;
+    }
+
+    @Override
+    public Void visit(SysmlPropertyDef ast, String indent) {
+        try {
+            this.out
+                    .append(indent)
+                    .append(ast.getPropertyType().getName())
+                    .append(" def ")
+                    .append(ast.getName())
+            ;
+            for (String s: ast.getSupers()){
                 this.out.append(" :> ").append(s);
             }
             if (ast.getElements().length > 0 || ast.getAnnotations().length > 0) {
                 this.out.append(" {\n");
-                for (SysmlAnnotation annot: ast.getAnnotations()){
-                    annot.accept(this, indent + indent_base);
+                for (SysmlAttribute annot: ast.getAnnotations()){
+                    this.out.append(indent + indent_base).append("attribute ").append(annot.getName()).append(": ").append(annot.getRef()).append(";\n");
+                    ///annot.accept(this, indent + indent_base);
                 }
                 for (SysmlBlockDefElement elem : ast.getElements()) {
                     elem.accept(this, indent + indent_base);

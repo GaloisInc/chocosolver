@@ -62,14 +62,14 @@ public class InstanceModel {
      * @param out
      * @throws IOException
      */
-    public void printSysml(Appendable out) throws IOException {
+    public void printSysml(Appendable out, String indent) throws IOException {
 
 
         for (InstanceClafer top : topClafers) {
             SysmlPrinter pprinter = new SysmlPrinter(out);
             InstanceSysmlCompiler compiler = new InstanceSysmlCompiler();
             SysmlProperty model = compiler.compile(top, top);
-            pprinter.visit(model, "");
+            pprinter.visit(model, indent);
         }
     }
 
