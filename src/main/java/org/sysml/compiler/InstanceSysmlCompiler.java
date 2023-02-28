@@ -8,6 +8,8 @@ import org.sysml.ast.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class InstanceSysmlCompiler {
 
@@ -15,14 +17,6 @@ public class InstanceSysmlCompiler {
 
     public InstanceSysmlCompiler(){
         this.processedClafers = new ArrayList<String>();
-    }
-
-    public String getPropertyId(String name){
-        if (name.startsWith("c0_")){
-            return name.substring(3);
-        } else {
-            return name;
-        }
     }
 
     int getMultiplicity(InstanceClafer model, AstClafer clafer){
@@ -40,7 +34,7 @@ public class InstanceSysmlCompiler {
         if (clafer.getSuperClafer() == null) {
             return hier;
         } else {
-            hier.add(getPropertyId(clafer.getSuperClafer().getName()));
+            hier.add(SysmlCompilerUtils.getPropertyId(clafer.getSuperClafer().getName()));
             return _getSuperClafers(clafer.getSuperClafer(), hier);
         }
     }
@@ -53,7 +47,7 @@ public class InstanceSysmlCompiler {
 
     public SysmlProperty compile(InstanceClafer model, InstanceClafer topLevelModel) {
         // collect the identifier
-        String propertyName = getPropertyId(model.getType().getName());
+        String propertyName =SysmlCompilerUtils.getPropertyId(model.getType().getName());
 
         // get its supers
         String[] superClafers = getSuperClafers(model.getType());
@@ -63,12 +57,15 @@ public class InstanceSysmlCompiler {
         ArrayList<SysmlBlockDefElement> children = new ArrayList<SysmlBlockDefElement>();
         for (InstanceClafer child : model.getChildren()) {
             if (!processedClafers.contains(child.getType().getName())) {
-                SysmlProperty cchild = compile(child, topLevelModel);
-                if (!cchild.getPropertyType().getName().equals("unk")) {
-                    children.add(cchild);
-                } else {
-                    SysmlBlockDefElement[] schildren = cchild.getElements();
-                    children.addAll(new ArrayList<SysmlBlockDefElement>(Arrays.asList(schildren)));
+                Object _cchild = compile(child, topLevelModel);
+                if (_cchild != null) {
+                    SysmlProperty cchild = (SysmlProperty) _cchild;
+                    if (!cchild.getPropertyType().getName().equals("unk")) {
+                        children.add(cchild);
+                    } else {
+                        SysmlBlockDefElement[] schildren = cchild.getElements();
+                        children.addAll(new ArrayList<SysmlBlockDefElement>(Arrays.asList(schildren)));
+                    }
                 }
             }
         }
@@ -93,22 +90,26 @@ public class InstanceSysmlCompiler {
             Object ref = child.getType().getRef();
             if (ref != null) {
                 AstRef aref = (AstRef) ref;
-                String aname = getPropertyId(aref.getSourceType().getName());
+                String aname = SysmlCompilerUtils.getPropertyId(aref.getSourceType().getName());
                 Object refv = child.getRef();
                 annots.add(new SysmlAttribute(aname, refv));
             }
         }
 
         // build a property object
-        return new SysmlProperty(
-                new SysmlBlockVisibility(SysmlVisibilityOption.PLUS),
-                new SysmlPropertyType(propName),
-                propertyName,
-                children.toArray(new SysmlBlockDefElement[children.size()]),
-                annots.toArray(new SysmlAttribute[annots.size()]),
-                superTypes,
-                multiplicity
-        );
+        if (propName.equals("unk") && children.size() == 0){
+            return null;
+        } else {
+            return new SysmlProperty(
+                    new SysmlBlockVisibility(SysmlVisibilityOption.PLUS),
+                    new SysmlPropertyType(propName),
+                    propertyName,
+                    children.toArray(new SysmlBlockDefElement[children.size()]),
+                    annots.toArray(new SysmlAttribute[annots.size()]),
+                    superTypes,
+                    multiplicity
+            );
+        }
     }
 
 }

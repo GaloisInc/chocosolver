@@ -68,8 +68,10 @@ public class InstanceModel {
         for (InstanceClafer top : topClafers) {
             SysmlPrinter pprinter = new SysmlPrinter(out);
             InstanceSysmlCompiler compiler = new InstanceSysmlCompiler();
-            SysmlProperty model = compiler.compile(top, top);
-            pprinter.visit(model, indent);
+            // model can be null as the clafer model might not reference sysml concepts
+            Object _model = compiler.compile(top, top);
+            if (_model != null)
+                pprinter.visit((SysmlProperty) _model, indent);
         }
     }
 

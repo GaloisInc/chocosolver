@@ -20,14 +20,6 @@ public class AstSysmlCompiler {
         this.typeMap.put("string", "String");
     }
 
-    public String getPropertyId(String name){
-        if (name.startsWith("c0_")){
-            return name.substring(3);
-        } else {
-            return name;
-        }
-    }
-
     public String[] getSuperClafers(AstClafer model){
         Object spr = model.getSuperClafer();
         if (spr == null){
@@ -35,7 +27,7 @@ public class AstSysmlCompiler {
         } else {
             String[] rem = getSuperClafers((AstClafer) spr);
             String[] sprs = Arrays.copyOf(rem, rem.length + 1);
-            sprs[0] = getPropertyId(((AstClafer) spr).getName());
+            sprs[0] = SysmlCompilerUtils.getPropertyId(((AstClafer) spr).getName());
             System.arraycopy(rem, 0, sprs, 1, rem.length);
             return sprs;
         }
@@ -44,7 +36,7 @@ public class AstSysmlCompiler {
         ArrayList<SysmlPropertyDef> propDefs = new ArrayList<SysmlPropertyDef>();
 
         for (AstAbstractClafer child: model.getAbstractRoot().getAbstractChildren()){
-            String name = getPropertyId(child.getName());
+            String name =   SysmlCompilerUtils.getPropertyId(child.getName());
 
             ArrayList<SysmlAttribute> attrs = new ArrayList<SysmlAttribute>();
             for (AstClafer sub: child.getChildren()) {
@@ -52,7 +44,7 @@ public class AstSysmlCompiler {
                 if (sref instanceof AstRef){
                     AstRef ref = (AstRef) sref;
                     Object tgt = typeMap.get(ref.getTargetType().toString());
-                    String propName = getPropertyId(ref.getSourceType().getName());
+                    String propName = SysmlCompilerUtils.getPropertyId(ref.getSourceType().getName());
                     attrs.add(new SysmlAttribute(propName, tgt));
                 }
             }
