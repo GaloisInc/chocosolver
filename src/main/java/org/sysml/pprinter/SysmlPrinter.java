@@ -34,35 +34,32 @@ public class SysmlPrinter implements SysmlExprVisitor<String, Void> {
     }
 
     @Override
-    public Void visit(SysmlProperty ast, String indent) {
-        try {
-            this.out
-                    .append(indent)
-                    .append(ast.getPropertyType().getName())
-                    .append(" ")
-                    .append(ast.getName())
-            ;
-            if (ast.getMultiplicity() > 1) {
-                this.out.append("[").append(String.valueOf(ast.getMultiplicity())).append("]");
-            }
-            for (String s: ast.getSupers()){
-                this.out.append(" : ").append(s);
-            }
-            if (ast.getElements().length > 0 || ast.getAnnotations().length > 0) {
-                this.out.append(" {\n");
-                for (SysmlAttribute annot: ast.getAnnotations()){
-                    annot.accept(this, indent + indent_base);
-                }
-                for (SysmlBlockDefElement elem : ast.getElements()) {
-                    elem.accept(this, indent + indent_base);
-                }
-                this.out.append(indent).append("}\n");
-            } else {
-                this.out.append(";\n");
-            }
-        } catch (IOException ignored) {
-
+    public Void visit(SysmlProperty ast, String indent) throws IOException {
+        this.out
+                .append(indent)
+                .append(ast.getPropertyType().getName())
+                .append(" ")
+                .append(ast.getName())
+        ;
+        if (ast.getMultiplicity() > 1) {
+            this.out.append("[").append(String.valueOf(ast.getMultiplicity())).append("]");
         }
+        for (String s: ast.getSupers()){
+            this.out.append(" : ").append(s);
+        }
+        if (ast.getElements().length > 0 || ast.getAnnotations().length > 0) {
+            this.out.append(" {\n");
+            for (SysmlAttribute annot: ast.getAnnotations()){
+                annot.accept(this, indent + indent_base);
+            }
+            for (SysmlBlockDefElement elem : ast.getElements()) {
+                elem.accept(this, indent + indent_base);
+            }
+            this.out.append(indent).append("}\n");
+        } else {
+            this.out.append(";\n");
+        }
+
         return null;
     }
 

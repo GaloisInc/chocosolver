@@ -5,7 +5,7 @@ import java.io.IOException;
 public interface SysmlExprVisitor <A, B>{
     B visit(SysmlPackage ast, A a) throws IOException;
 
-    B visit(SysmlProperty ast, A a);
+    B visit(SysmlProperty ast, A a) throws IOException;
 
     B visit(SysmlAttribute ast, A a) throws IOException;
 

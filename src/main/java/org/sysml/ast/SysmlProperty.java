@@ -2,6 +2,8 @@ package org.sysml.ast;
 
 import org.clafer.common.Check;
 
+import java.io.IOException;
+
 /**
  * SysML Property
  *
@@ -76,7 +78,7 @@ public class SysmlProperty implements SysmlBlockDefElement {
     }
 
     @Override
-    public <A, B> B accept(SysmlExprVisitor<A, B> visitor, A a) {
+    public <A, B> B accept(SysmlExprVisitor<A, B> visitor, A a) throws IOException {
         return visitor.visit(this, a);
     }
 }
