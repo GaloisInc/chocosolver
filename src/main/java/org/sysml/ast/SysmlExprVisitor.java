@@ -9,5 +9,5 @@ public interface SysmlExprVisitor <A, B>{
 
     B visit(SysmlAttribute ast, A a) throws IOException;
 
-    B visit(SysmlPropertyDef sysmlPropertyDef, A a);
+    B visit(SysmlPropertyDef sysmlPropertyDef, A a) throws IOException;
 }

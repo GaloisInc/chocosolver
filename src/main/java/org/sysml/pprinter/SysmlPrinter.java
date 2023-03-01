@@ -64,32 +64,28 @@ public class SysmlPrinter implements SysmlExprVisitor<String, Void> {
     }
 
     @Override
-    public Void visit(SysmlPropertyDef ast, String indent) {
-        try {
-            this.out
-                    .append(indent)
-                    .append(ast.getPropertyType().getName())
-                    .append(" def ")
-                    .append(ast.getName())
-            ;
-            for (String s: ast.getSupers()){
-                this.out.append(" :> ").append(s);
+    public Void visit(SysmlPropertyDef ast, String indent) throws IOException {
+        this.out
+                .append(indent)
+                .append(ast.getPropertyType().getName())
+                .append(" def ")
+                .append(ast.getName())
+        ;
+        for (String s: ast.getSupers()){
+            this.out.append(" :> ").append(s);
+        }
+        if (ast.getElements().length > 0 || ast.getAnnotations().length > 0) {
+            this.out.append(" {\n");
+            for (SysmlAttribute annot: ast.getAnnotations()){
+                this.out.append(indent + indent_base).append("attribute ").append(annot.getName()).append(": ").append(annot.getRef()).append(";\n");
+                ///annot.accept(this, indent + indent_base);
             }
-            if (ast.getElements().length > 0 || ast.getAnnotations().length > 0) {
-                this.out.append(" {\n");
-                for (SysmlAttribute annot: ast.getAnnotations()){
-                    this.out.append(indent + indent_base).append("attribute ").append(annot.getName()).append(": ").append(annot.getRef()).append(";\n");
-                    ///annot.accept(this, indent + indent_base);
-                }
-                for (SysmlBlockDefElement elem : ast.getElements()) {
-                    elem.accept(this, indent + indent_base);
-                }
-                this.out.append(indent).append("}\n");
-            } else {
-                this.out.append(";\n");
+            for (SysmlBlockDefElement elem : ast.getElements()) {
+                elem.accept(this, indent + indent_base);
             }
-        } catch (IOException ignored) {
-
+            this.out.append(indent).append("}\n");
+        } else {
+            this.out.append(";\n");
         }
         return null;
     }
