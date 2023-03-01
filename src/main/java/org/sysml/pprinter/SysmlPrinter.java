@@ -98,16 +98,12 @@ public class SysmlPrinter implements SysmlExprVisitor<String, Void> {
     }
 
     @Override
-    public Void visit(SysmlPackage ast, String indent) {
-        try {
-            this.out.append(indent).append("package ").append(ast.getName()).append(" {").append("\n");
-            for (SysmlBlockDefElement elem : ast.getElements()) {
-                elem.accept(this, indent + indent_base);
-            }
-            this.out.append(indent).append("}\n");
-        } catch (IOException ignored) {
-
+    public Void visit(SysmlPackage ast, String indent) throws IOException {
+        this.out.append(indent).append("package ").append(ast.getName()).append(" {").append("\n");
+        for (SysmlBlockDefElement elem : ast.getElements()) {
+            elem.accept(this, indent + indent_base);
         }
+        this.out.append(indent).append("}\n");
         return null;
     }
 }
