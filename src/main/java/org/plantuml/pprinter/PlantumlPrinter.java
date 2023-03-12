@@ -1,7 +1,6 @@
 package org.plantuml.pprinter;
 
-import org.plantuml.ast.PlantumlExprVisitor;
-import org.plantuml.ast.PlantumlProgram;
+import org.plantuml.ast.*;
 
 import java.io.IOException;
 
@@ -24,6 +23,21 @@ public class PlantumlPrinter implements PlantumlExprVisitor<String, Void> {
     public Void visit(PlantumlProgram ast, String indent) throws IOException {
         this.out.append(indent).append("@startuml").append("\n");
         this.out.append(indent).append("@enduml").append("\n");
+        return null;
+    }
+
+    @Override
+    public Void visit(PlantumlObject plantumlObject, String s) throws IOException {
+        return null;
+    }
+
+    @Override
+    public Void visit(PlantumlPropertyGroup plantumlPropertyGroup, String s) throws IOException {
+        return null;
+    }
+
+    @Override
+    public Void visit(PlantumlProperty plantumlProperty, String s) throws IOException {
         return null;
     }
 }

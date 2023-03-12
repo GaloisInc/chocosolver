@@ -2,17 +2,18 @@ package org.plantuml.ast;
 
 import java.io.IOException;
 
-public class PlantumlObject implements PlantumlExpr, PlantumlId {
-    private final String name;
-    private final PlantumlPropertyGroup[] propertyGroups;
+public class PlantumlPropertyGroup implements PlantumlId, PlantumlExpr {
 
-    public PlantumlObject(String name, PlantumlPropertyGroup[] propertyGroups) {
+    private final String name;
+    private PlantumlProperty[] properties;
+
+    public PlantumlPropertyGroup(String name, PlantumlProperty[] properties) {
+        this.properties = properties;
         this.name = name;
-        this.propertyGroups = propertyGroups;
     }
 
-    public PlantumlPropertyGroup[] getPropertyGroups() {
-        return propertyGroups;
+    public PlantumlProperty[] getProperties() {
+        return this.properties;
     }
 
     @Override

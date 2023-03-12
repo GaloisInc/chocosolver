@@ -10,4 +10,10 @@ import java.io.IOException;
  */
 public interface PlantumlExprVisitor<A, B> {
     B visit(PlantumlProgram plantumlProgram, A a) throws IOException;
+
+    B visit(PlantumlObject plantumlObject, A a) throws IOException;
+
+    B visit(PlantumlPropertyGroup plantumlPropertyGroup, A a) throws IOException;
+
+    B visit(PlantumlProperty plantumlProperty, A a) throws IOException;
 }

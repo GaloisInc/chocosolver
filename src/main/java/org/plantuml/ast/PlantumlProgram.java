@@ -16,6 +16,14 @@ public class PlantumlProgram implements PlantumlExpr {
     private PlantumlConnection[] connections;
 
     public PlantumlProgram() {
+        this.objects = new PlantumlObject[0];
+        this.connections = new PlantumlConnection[0];
+    }
+
+    public PlantumlProgram(PlantumlObject[] objects, PlantumlConnection[] connections) {
+        this.objects = objects;
+        this.connections = connections;
+
     }
 
     @Override
