@@ -26,11 +26,12 @@ public class Main
                 accepts( "n", "Specify the maximum number of instances." ).withRequiredArg().ofType( Integer.class );
                 accepts( "noprint", "Don't print the instances to the console or a file");
                 accepts( "output", "Output instances to the given file." ).withRequiredArg().ofType( File.class ).describedAs( "text file" );
+                accepts( "plantuml", "Print the clafer model as PlantUML" );
                 accepts( "prettify", "Use simple and pretty output format (not formal)." );
-                accepts( "sysml", "Print the instances as SysMLv2" );
                 accepts( "repl", "Run in REPL (interactive) mode." );
                 accepts( "scope", "Override the default global scope value." ).withRequiredArg().ofType( Integer.class );
                 accepts( "search", "PreferSmallerInstances/PreferLargerInstances/Random" ).withRequiredArg().ofType( ClaferSearchStrategy.class );
+                accepts( "sysml", "Print the instances as SysMLv2" );
                 accepts( "time", "Time how long it takes to find all instances (and print if it is turned on");
                 accepts( "v", "Run in validation mode; checks all assertions." );
                 accepts( "version", "Display the tool version" );

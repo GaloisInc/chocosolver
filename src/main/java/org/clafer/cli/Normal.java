@@ -45,9 +45,17 @@ public class Normal {
         int index = 0; // instance id
         boolean prettify = options.has("prettify");
         boolean sysml = options.has("sysml");
+        boolean plantuml = options.has("plantuml");
         boolean printOff = options.has("noprint");
         boolean dataTackingOn = options.has("dataFile");
         boolean timeOn = options.has("time");
+
+        // check for conflicting options
+        if (plantuml && sysml) {
+            System.err.println("Bad CLI config: both plantuml and sysml are selected");
+            return;
+        }
+
         File dataFile;
         PrintStream dataStream = null;
         if (dataTackingOn) {
@@ -64,6 +72,8 @@ public class Normal {
             n = (int)options.valueOf("n");
         else
             n = -1;
+
+
 
         while (solver.find()) {
             if (dataTackingOn) {
