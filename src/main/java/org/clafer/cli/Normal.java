@@ -13,6 +13,9 @@ import org.clafer.javascript.JavascriptFile;
 import org.clafer.objective.Objective;
 import org.clafer.scope.Scope;
 import org.clafer.ast.AstModel;
+import org.plantuml.ast.PlantumlProgram;
+import org.plantuml.compiler.AstPlantumlCompiler;
+import org.plantuml.pprinter.PlantumlPrinter;
 import org.sysml.ast.SysmlProperty;
 import org.sysml.ast.SysmlPropertyDef;
 import org.sysml.compiler.AstSysmlCompiler;
@@ -63,6 +66,15 @@ public class Normal {
             dataStream = new PrintStream(dataFile);
         }
 
+        if (plantuml) {
+            AstModel top = javascriptFile.getModel();
+            AstPlantumlCompiler compiler = new AstPlantumlCompiler();
+            PlantumlProgram prog = compiler.compile(top);
+            PlantumlPrinter pprinter = new PlantumlPrinter(outStream);
+            pprinter.visit(prog, "");
+            return;
+        }
+
         double elapsedTime;
 
         long startTime = System.nanoTime();
@@ -72,8 +84,6 @@ public class Normal {
             n = (int)options.valueOf("n");
         else
             n = -1;
-
-
 
         while (solver.find()) {
             if (dataTackingOn) {
