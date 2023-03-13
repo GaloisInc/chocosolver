@@ -121,7 +121,7 @@ public class AstPlantumlCompiler {
             if (ast.getCard().toString().equals("0..1")){
                 toConn = 'o';
             } else if (ast.getCard().toString().equals("1")) {
-               toConn = '-';
+               toConn = '*';
             } else {
                 if (ast.getCard().toString().startsWith("0")) {
                     toConn = 'o';
