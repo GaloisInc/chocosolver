@@ -59,7 +59,7 @@ public class PlantumlPrinter implements PlantumlExprVisitor<String, Void> {
 
     @Override
     public Void visit(PlantumlProperty plantumlProperty, String s) throws IOException {
-        this.out.append(s).append(plantumlProperty.getProp()).append('\n');
+        this.out.append(s).append("* ").append(plantumlProperty.getProp()).append('\n');
         return null;
     }
 
@@ -67,7 +67,7 @@ public class PlantumlPrinter implements PlantumlExprVisitor<String, Void> {
     public Void visit(PlantumlConnection plantumlConnection, String s) throws IOException {
         this.out.append(s)
                 .append(plantumlConnection.getFromObj())
-                .append(" ").append(plantumlConnection.getFromConn()).append("-").append(plantumlConnection.getToConn())
+                .append(" ").append(plantumlConnection.getFromConn()).append(plantumlConnection.getLineChar()).append(plantumlConnection.getToConn())
                 .append(" ")
                 .append(plantumlConnection.getToObj());
         if (plantumlConnection.getLabel().length() > 0){

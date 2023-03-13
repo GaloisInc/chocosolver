@@ -6,6 +6,7 @@ import org.sysml.compiler.SysmlCompilerUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.WeakHashMap;
 
 /**
@@ -13,6 +14,8 @@ import java.util.WeakHashMap;
  *
  * Note that this compilation doesn't require instances, so we don't need to run the solver
  * to compile.
+ *
+ * TODO: this should be refactored to cut down the code re-use.
  */
 public class AstPlantumlCompiler {
     /**
@@ -24,6 +27,9 @@ public class AstPlantumlCompiler {
         ArrayList<PlantumlObject> objs = new ArrayList<PlantumlObject>();
 
         for (AstConcreteClafer ast: concreteClafers) {
+            if (ast.getRef() != null) {
+                continue;
+            }
             ArrayList<PlantumlPropertyGroup> pgs = new ArrayList<PlantumlPropertyGroup>();
 
             ArrayList<PlantumlProperty> constrs = new ArrayList<PlantumlProperty>();
@@ -62,11 +68,26 @@ public class AstPlantumlCompiler {
         ArrayList<PlantumlObject> objs = new ArrayList<PlantumlObject>();
 
         for (AstAbstractClafer ast: abstractClafers) {
+            if (ast.getRef() != null) {
+                continue;
+            }
             ArrayList<PlantumlPropertyGroup> pgs = new ArrayList<PlantumlPropertyGroup>();
 
             ArrayList<PlantumlProperty> constrs = new ArrayList<PlantumlProperty>();
             for (AstConstraint constr: ast.getConstraints()) {
                 constrs.add(new PlantumlProperty(constr.toString()));
+            }
+
+            ArrayList<PlantumlProperty> refs = new ArrayList<PlantumlProperty>();
+            for (AstConcreteClafer clafer: ast.getChildren()){
+                AstRef ref = clafer.getRef();
+                if (ref != null) {
+                    refs.add(new PlantumlProperty(ref.toString()));
+                }
+            }
+
+            if (refs.size() > 0){
+                pgs.add(new PlantumlPropertyGroup("Attributes", refs.toArray(new PlantumlProperty[0])));
             }
 
             if (constrs.size() > 0){
@@ -106,8 +127,12 @@ public class AstPlantumlCompiler {
         ArrayList<PlantumlConnection> connections = new ArrayList<PlantumlConnection>();
 
         for (AstConcreteClafer ast: concreteClafers) {
+            if (ast.getRef() != null) {
+                continue;
+            }
             String fromObj = SysmlCompilerUtils.getPropertyId(ast.getParent().getName());
             String toObj = SysmlCompilerUtils.getPropertyId(ast.getName());
+            Card card = ast.getCard();
             String label = "";
             char toConn = '*';
             char fromConn = '-';
@@ -118,15 +143,15 @@ public class AstPlantumlCompiler {
                     fromConn = '*';
                 }
             }
-            if (ast.getCard().toString().equals("0..1")){
+            if (card.toString().equals("0..1")){
                 toConn = 'o';
-            } else if (ast.getCard().toString().equals("1")) {
+            } else if (card.toString().equals("1")) {
                toConn = '*';
             } else {
-                if (ast.getCard().toString().startsWith("0")) {
+                if (card.toString().startsWith("0")) {
                     toConn = 'o';
                 }
-                label = ast.getCard().toString();
+                label = card.toString();
             }
             if (!(fromObj.startsWith("#") || toObj.startsWith("#"))) {
                 connections.add(
@@ -138,6 +163,24 @@ public class AstPlantumlCompiler {
                                 label
                         )
                 );
+            }
+
+            AstClafer superClafer = ast.getSuperClafer();
+            if (superClafer != null) {
+                String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
+                if (!scName.startsWith("#")) {
+                    fromObj = scName;
+                    connections.add(
+                            new PlantumlConnection(
+                                    toObj,
+                                    fromObj,
+                                    '.',
+                                    '>',
+                                    "",
+                                    '.'
+                            )
+                    );
+                }
             }
 
             connections.addAll(getConcreteConnections(ast.getChildren()));
@@ -150,6 +193,9 @@ public class AstPlantumlCompiler {
         ArrayList<PlantumlConnection> connections = new ArrayList<PlantumlConnection>();
 
         for (AstAbstractClafer ast: abstractClafers) {
+            if (ast.getRef() != null) {
+                continue;
+            }
             String fromObj = SysmlCompilerUtils.getPropertyId(ast.getParent().getName());
             String toObj = SysmlCompilerUtils.getPropertyId(ast.getName());
             String label = "";
@@ -172,6 +218,24 @@ public class AstPlantumlCompiler {
                                 label
                         )
                 );
+            }
+
+            AstClafer superClafer = ast.getSuperClafer();
+            if (superClafer != null) {
+                String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
+                if (!scName.startsWith("#")) {
+                    fromObj = scName;
+                    connections.add(
+                            new PlantumlConnection(
+                                    toObj,
+                                    fromObj,
+                                    '.',
+                                    '>',
+                                    "",
+                                    '.'
+                            )
+                    );
+                }
             }
 
             connections.addAll(getAbstractConnections(ast.getAbstractChildren()));

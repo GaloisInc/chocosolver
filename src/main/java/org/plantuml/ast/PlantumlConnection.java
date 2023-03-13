@@ -8,6 +8,8 @@ public class PlantumlConnection implements PlantumlExpr  {
     private final char fromConn;
     private final char toConn;
 
+    private final char lineChar;
+
     private final String label;
 
     public PlantumlConnection(String fromObj, String toObj, char fromConn, char toConn, String label){
@@ -16,6 +18,16 @@ public class PlantumlConnection implements PlantumlExpr  {
         this.fromConn = fromConn;
         this.toConn = toConn;
         this.label = label;
+        this.lineChar = '-';
+    }
+
+    public PlantumlConnection(String fromObj, String toObj, char fromConn, char toConn, String label, char lineChar){
+        this.fromObj = fromObj;
+        this.toObj = toObj;
+        this.fromConn = fromConn;
+        this.toConn = toConn;
+        this.label = label;
+        this.lineChar = lineChar;
     }
 
     public String getFromObj(){
@@ -36,6 +48,10 @@ public class PlantumlConnection implements PlantumlExpr  {
 
     public String getLabel(){
         return label;
+    }
+
+    public char getLineChar(){
+        return lineChar;
     }
 
     @Override
