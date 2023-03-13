@@ -22,22 +22,40 @@ public class PlantumlPrinter implements PlantumlExprVisitor<String, Void> {
     @Override
     public Void visit(PlantumlProgram ast, String indent) throws IOException {
         this.out.append(indent).append("@startuml").append("\n");
+        for (PlantumlObject obj: ast.getObjects()){
+            obj.accept(this, indent + indentBase);
+        }
         this.out.append(indent).append("@enduml").append("\n");
         return null;
     }
 
     @Override
     public Void visit(PlantumlObject plantumlObject, String s) throws IOException {
+        this.out.append(s).append("object ").append(plantumlObject.getName());
+        if (plantumlObject.getPropertyGroups().length > 0) {
+            this.out.append(" {\n");
+            for (PlantumlPropertyGroup grp: plantumlObject.getPropertyGroups()){
+                grp.accept(this, s + indentBase);
+            }
+            this.out.append(s).append("}\n");
+        } else {
+            this.out.append("\n");
+        }
         return null;
     }
 
     @Override
     public Void visit(PlantumlPropertyGroup plantumlPropertyGroup, String s) throws IOException {
+        this.out.append(s).append(".. ").append(plantumlPropertyGroup.getName()).append(" ..").append("\n");
+        for (PlantumlProperty prop: plantumlPropertyGroup.getProperties()){
+            prop.accept(this, s);
+        }
         return null;
     }
 
     @Override
     public Void visit(PlantumlProperty plantumlProperty, String s) throws IOException {
+        this.out.append(s).append(plantumlProperty.getProp()).append('\n');
         return null;
     }
 }
