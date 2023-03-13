@@ -115,7 +115,7 @@ public class AstPlantumlCompiler {
                 if (ast.getParent().getGroupCard().toString().equals("1")){
                     fromConn = '+';
                 } else if (ast.getParent().getGroupCard().toString().equals("1..*")) {
-                    fromConn = 'o';
+                    fromConn = '*';
                 }
             }
             if (ast.getCard().toString().equals("0..1")){
@@ -159,7 +159,7 @@ public class AstPlantumlCompiler {
                 if (ast.getParent().getGroupCard().toString().equals("1")){
                     fromConn = '+';
                 } else if (ast.getParent().getGroupCard().toString().equals("1..*")) {
-                    fromConn = 'o';
+                    fromConn = '*';
                 }
             }
             if (!(fromObj.startsWith("#") || toObj.startsWith("#"))) {
