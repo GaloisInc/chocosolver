@@ -1,9 +1,6 @@
 package org.plantuml.compiler;
 
-import org.clafer.ast.AstAbstractClafer;
-import org.clafer.ast.AstConcreteClafer;
-import org.clafer.ast.AstConstraint;
-import org.clafer.ast.AstModel;
+import org.clafer.ast.*;
 import org.plantuml.ast.*;
 import org.sysml.compiler.SysmlCompilerUtils;
 
@@ -105,20 +102,40 @@ public class AstPlantumlCompiler {
         return objs;
     }
 
-    private ArrayList<PlantumlConnection> getConcreteConnections(List<AstConcreteClafer> abstractClafers) {
+    private ArrayList<PlantumlConnection> getConcreteConnections(List<AstConcreteClafer> concreteClafers) {
         ArrayList<PlantumlConnection> connections = new ArrayList<PlantumlConnection>();
 
-        for (AstConcreteClafer ast: abstractClafers) {
+        for (AstConcreteClafer ast: concreteClafers) {
             String fromObj = SysmlCompilerUtils.getPropertyId(ast.getParent().getName());
             String toObj = SysmlCompilerUtils.getPropertyId(ast.getName());
+            String label = "";
+            char toConn = '*';
+            char fromConn = '-';
+            if (ast.getParent().hasGroupCard()){
+                if (ast.getParent().getGroupCard().toString().equals("1")){
+                    fromConn = '+';
+                } else if (ast.getParent().getGroupCard().toString().equals("1..*")) {
+                    fromConn = 'o';
+                }
+            }
+            if (ast.getCard().toString().equals("0..1")){
+                toConn = 'o';
+            } else if (ast.getCard().toString().equals("1")) {
+               toConn = '-';
+            } else {
+                if (ast.getCard().toString().startsWith("0")) {
+                    toConn = 'o';
+                }
+                label = ast.getCard().toString();
+            }
             if (!(fromObj.startsWith("#") || toObj.startsWith("#"))) {
                 connections.add(
                         new PlantumlConnection(
                                 fromObj,
                                 toObj,
-                                '-',
-                                '*',
-                                ""
+                                fromConn,
+                                toConn,
+                                label
                         )
                 );
             }
@@ -135,14 +152,24 @@ public class AstPlantumlCompiler {
         for (AstAbstractClafer ast: abstractClafers) {
             String fromObj = SysmlCompilerUtils.getPropertyId(ast.getParent().getName());
             String toObj = SysmlCompilerUtils.getPropertyId(ast.getName());
+            String label = "";
+            char toConn = '*';
+            char fromConn = '-';
+            if (ast.getParent().hasGroupCard()){
+                if (ast.getParent().getGroupCard().toString().equals("1")){
+                    fromConn = '+';
+                } else if (ast.getParent().getGroupCard().toString().equals("1..*")) {
+                    fromConn = 'o';
+                }
+            }
             if (!(fromObj.startsWith("#") || toObj.startsWith("#"))) {
                 connections.add(
                         new PlantumlConnection(
                                 fromObj,
                                 toObj,
-                                '-',
-                                '*',
-                                ""
+                                fromConn,
+                                toConn,
+                                label
                         )
                 );
             }
