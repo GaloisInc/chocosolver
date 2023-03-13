@@ -72,6 +72,9 @@ public class Normal {
             PlantumlProgram prog = compiler.compile(top);
             PlantumlPrinter pprinter = new PlantumlPrinter(outStream);
             pprinter.visit(prog, "");
+            if (dataStream != null){
+                dataStream.close();
+            }
             return;
         }
 
@@ -136,6 +139,11 @@ public class Normal {
                 else
                     System.out.println("Generated " + (n == -1 ? "all " : "") + index + " optimal instance(s) within the scope\n");
             }
+        }
+
+        // make sure to close this resource
+        if (dataStream != null){
+            dataStream.close();
         }
     }
 }
