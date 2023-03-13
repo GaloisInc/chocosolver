@@ -169,11 +169,12 @@ public class AstPlantumlCompiler {
             if (superClafer != null) {
                 String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
                 if (!scName.startsWith("#")) {
-                    fromObj = scName;
+                    fromObj = toObj;
+                    toObj = scName;
                     connections.add(
                             new PlantumlConnection(
-                                    toObj,
                                     fromObj,
+                                    toObj,
                                     '.',
                                     '>',
                                     "",
@@ -224,11 +225,12 @@ public class AstPlantumlCompiler {
             if (superClafer != null) {
                 String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
                 if (!scName.startsWith("#")) {
-                    fromObj = scName;
+                    fromObj = toObj;
+                    toObj = scName;
                     connections.add(
                             new PlantumlConnection(
-                                    toObj,
                                     fromObj,
+                                    toObj,
                                     '.',
                                     '>',
                                     "",
