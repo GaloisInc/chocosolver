@@ -25,12 +25,16 @@ import org.sysml.pprinter.SysmlPrinter;
 public class Normal {
     // Running the model itself(instantiating or optimizing)
     public static void runNormal(JavascriptFile  javascriptFile, OptionSet options, PrintStream outStream) throws Exception {
+        //do this first to cut irrelevant optimizing message
+        boolean plantuml = options.has("plantuml");
 
         Objective[] objectives = javascriptFile.getObjectives();
-        if (objectives.length == 0)
-            System.out.println("Instantiating...");
-        else
-            System.out.println("Optimizing...");
+        if (!plantuml){
+            if (objectives.length == 0)
+                System.out.println("Instantiating...");
+            else
+                System.out.println("Optimizing...");
+        }
 
         // handle scopes
         Scope scope = Utils.resolveScopes(javascriptFile, options);
@@ -48,7 +52,6 @@ public class Normal {
         int index = 0; // instance id
         boolean prettify = options.has("prettify");
         boolean sysml = options.has("sysml");
-        boolean plantuml = options.has("plantuml");
         boolean printOff = options.has("noprint");
         boolean dataTackingOn = options.has("dataFile");
         boolean timeOn = options.has("time");
