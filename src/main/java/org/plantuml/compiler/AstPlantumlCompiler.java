@@ -9,6 +9,7 @@ import org.sysml.compiler.SysmlCompilerUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.WeakHashMap;
 
 /**
  * Clafer AST to PlantUML
@@ -42,7 +43,10 @@ public class AstPlantumlCompiler {
                     SysmlCompilerUtils.getPropertyId(ast.getName()),
                     pgs.toArray(new PlantumlPropertyGroup[0])
             );
-            objs.add(obj);
+
+            if (!obj.getName().startsWith("#")) {
+                objs.add(obj);
+            }
 
             // add all of its children
             // TODO: check for collisions?
@@ -77,7 +81,10 @@ public class AstPlantumlCompiler {
                     SysmlCompilerUtils.getPropertyId(ast.getName()),
                     pgs.toArray(new PlantumlPropertyGroup[0])
             );
-            objs.add(obj);
+
+            if (!obj.getName().startsWith("#")){
+                objs.add(obj);
+            }
 
             // add all of its children
             // TODO: check for collisions?
@@ -98,12 +105,67 @@ public class AstPlantumlCompiler {
         return objs;
     }
 
+    private ArrayList<PlantumlConnection> getConcreteConnections(List<AstConcreteClafer> abstractClafers) {
+        ArrayList<PlantumlConnection> connections = new ArrayList<PlantumlConnection>();
+
+        for (AstConcreteClafer ast: abstractClafers) {
+            String fromObj = SysmlCompilerUtils.getPropertyId(ast.getParent().getName());
+            String toObj = SysmlCompilerUtils.getPropertyId(ast.getName());
+            if (!(fromObj.startsWith("#") || toObj.startsWith("#"))) {
+                connections.add(
+                        new PlantumlConnection(
+                                fromObj,
+                                toObj,
+                                '-',
+                                '*',
+                                ""
+                        )
+                );
+            }
+
+            connections.addAll(getConcreteConnections(ast.getChildren()));
+        }
+
+        return connections;
+    }
+
+    private ArrayList<PlantumlConnection> getAbstractConnections(List<AstAbstractClafer> abstractClafers) {
+        ArrayList<PlantumlConnection> connections = new ArrayList<PlantumlConnection>();
+
+        for (AstAbstractClafer ast: abstractClafers) {
+            String fromObj = SysmlCompilerUtils.getPropertyId(ast.getParent().getName());
+            String toObj = SysmlCompilerUtils.getPropertyId(ast.getName());
+            if (!(fromObj.startsWith("#") || toObj.startsWith("#"))) {
+                connections.add(
+                        new PlantumlConnection(
+                                fromObj,
+                                toObj,
+                                '-',
+                                '*',
+                                ""
+                        )
+                );
+            }
+
+            connections.addAll(getAbstractConnections(ast.getAbstractChildren()));
+            connections.addAll(getConcreteConnections(ast.getChildren()));
+        }
+
+        return connections;
+    }
+
+    private ArrayList<PlantumlConnection> getConnections(AstModel model) {
+        ArrayList<PlantumlConnection> connections = getAbstractConnections(model.getAbstracts());
+        connections.addAll(getConcreteConnections(model.getChildren()));
+        return connections;
+    }
+
     public PlantumlProgram compile(AstModel model) {
         ArrayList<PlantumlObject> objs = getObjects(model);
+        ArrayList<PlantumlConnection> conns = getConnections(model);
 
         return new PlantumlProgram(
-           objs.toArray(new PlantumlObject[0]),
-                new PlantumlConnection[0]
+           objs.toArray(new PlantumlObject[0]), conns.toArray(new PlantumlConnection[0])
         );
     }
 }

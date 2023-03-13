@@ -16,4 +16,6 @@ public interface PlantumlExprVisitor<A, B> {
     B visit(PlantumlPropertyGroup plantumlPropertyGroup, A a) throws IOException;
 
     B visit(PlantumlProperty plantumlProperty, A a) throws IOException;
+
+    B visit(PlantumlConnection plantumlConnection, A a) throws IOException;
 }

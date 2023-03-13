@@ -30,6 +30,10 @@ public class PlantumlProgram implements PlantumlExpr {
         return objects;
     }
 
+    public PlantumlConnection[] getConnections(){
+        return connections;
+    }
+
     @Override
     public <A, B> B accept(PlantumlExprVisitor<A, B> visitor, A a) throws IOException {
         return visitor.visit(this, a);

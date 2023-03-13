@@ -25,6 +25,10 @@ public class PlantumlPrinter implements PlantumlExprVisitor<String, Void> {
         for (PlantumlObject obj: ast.getObjects()){
             obj.accept(this, indent + indentBase);
         }
+        this.out.append('\n');
+        for (PlantumlConnection conn: ast.getConnections()){
+            conn.accept(this, indent + indentBase);
+        }
         this.out.append(indent).append("@enduml").append("\n");
         return null;
     }
@@ -56,6 +60,22 @@ public class PlantumlPrinter implements PlantumlExprVisitor<String, Void> {
     @Override
     public Void visit(PlantumlProperty plantumlProperty, String s) throws IOException {
         this.out.append(s).append(plantumlProperty.getProp()).append('\n');
+        return null;
+    }
+
+    @Override
+    public Void visit(PlantumlConnection plantumlConnection, String s) throws IOException {
+        this.out.append(s)
+                .append(plantumlConnection.getFromObj())
+                .append(" ").append(plantumlConnection.getFromConn()).append("-").append(plantumlConnection.getToConn())
+                .append(" ")
+                .append(plantumlConnection.getToObj());
+        if (plantumlConnection.getLabel().length() > 0){
+            this.out.append(" ")
+                    .append(": ")
+                    .append(plantumlConnection.getLabel());
+        }
+        this.out.append('\n');
         return null;
     }
 }
