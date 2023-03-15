@@ -4,6 +4,7 @@ import org.clafer.ast.*;
 import org.plantuml.ast.*;
 import org.sysml.compiler.SysmlCompilerUtils;
 import org.tomlj.Toml;
+import org.tomlj.TomlArray;
 import org.tomlj.TomlParseResult;
 
 import java.io.File;
@@ -13,6 +14,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Clafer AST to PlantUML
@@ -27,10 +30,23 @@ public class AstPlantumlCompiler {
     private final boolean includeSuperClafers;
     private final int includeLevels;
 
+    private final List<String> clafersBlacklist;
+
     public AstPlantumlCompiler(AstPlantumlCompilerBuilder builder){
         this.includeConstraints = builder.includeConstraints;
         this.includeSuperClafers = builder.includeSuperClafers;
         this.includeLevels = builder.includeLevels;
+        this.clafersBlacklist = builder.clafersBlacklist;
+    }
+
+    boolean checkBlacklist(String name){
+        for (String regex: this.clafersBlacklist){
+            Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(name);
+            boolean matchFound = matcher.find();
+            if (matchFound) return true;
+        }
+        return false;
     }
 
     /**
@@ -38,7 +54,7 @@ public class AstPlantumlCompiler {
      * @param concreteClafers concreteClafers held in a claferModel
      * @return ArrayList of all nested clafers (abstract included)
      */
-    private ArrayList<PlantumlObject> getConcreteObjects(List<AstConcreteClafer> concreteClafers) {
+    private ArrayList<PlantumlObject> getConcreteObjects(List<AstConcreteClafer> concreteClafers, int level) {
         ArrayList<PlantumlObject> objs = new ArrayList<PlantumlObject>();
 
         for (AstConcreteClafer ast: concreteClafers) {
@@ -69,14 +85,14 @@ public class AstPlantumlCompiler {
                     pgs.toArray(new PlantumlPropertyGroup[0])
             );
 
-            if (!obj.getName().startsWith("#")) {
+            if (!obj.getName().startsWith("#") && !checkBlacklist(obj.getName())) {
                 objs.add(obj);
             }
 
             // add all of its children
             // TODO: check for collisions?
             //objs.addAll(getAbstractObjects(ast.getAbstractChildren()));
-            objs.addAll(getConcreteObjects(ast.getChildren()));
+            if (level < this.includeLevels) objs.addAll(getConcreteObjects(ast.getChildren(), level + 1));
         }
         return objs;
     }
@@ -86,7 +102,7 @@ public class AstPlantumlCompiler {
      * @param abstractClafers abstractClafers held in a claferModel
      * @return ArrayList of all nested clafers (concrete included)
      */
-    private ArrayList<PlantumlObject> getAbstractObjects(List<AstAbstractClafer> abstractClafers) {
+    private ArrayList<PlantumlObject> getAbstractObjects(List<AstAbstractClafer> abstractClafers, int level) {
         ArrayList<PlantumlObject> objs = new ArrayList<PlantumlObject>();
 
         for (AstAbstractClafer ast: abstractClafers) {
@@ -122,14 +138,14 @@ public class AstPlantumlCompiler {
                     pgs.toArray(new PlantumlPropertyGroup[0])
             );
 
-            if (!obj.getName().startsWith("#")){
+            if (!obj.getName().startsWith("#") && !checkBlacklist(obj.getName())){
                 objs.add(obj);
             }
 
             // add all of its children
             // TODO: check for collisions?
-            objs.addAll(getAbstractObjects(ast.getAbstractChildren()));
-            objs.addAll(getConcreteObjects(ast.getChildren()));
+            if (level < this.includeLevels) objs.addAll(getAbstractObjects(ast.getAbstractChildren(), level + 1));
+            if (level < this.includeLevels) objs.addAll(getConcreteObjects(ast.getChildren(), level + 1));
         }
         return objs;
     }
@@ -140,12 +156,12 @@ public class AstPlantumlCompiler {
      * @return ArrayList of all clafers (abstract and concrete) suitable for PlantUML objects
      */
     private ArrayList<PlantumlObject> getObjects(AstModel model) {
-        ArrayList<PlantumlObject> objs = getAbstractObjects(model.getAbstracts());
-        objs.addAll(getConcreteObjects(model.getChildren()));
+        ArrayList<PlantumlObject> objs = getAbstractObjects(model.getAbstracts(), 0);
+        objs.addAll(getConcreteObjects(model.getChildren(), 0));
         return objs;
     }
 
-    private ArrayList<PlantumlConnection> getConcreteConnections(List<AstConcreteClafer> concreteClafers) {
+    private ArrayList<PlantumlConnection> getConcreteConnections(List<AstConcreteClafer> concreteClafers, int level) {
         ArrayList<PlantumlConnection> connections = new ArrayList<PlantumlConnection>();
 
         for (AstConcreteClafer ast: concreteClafers) {
@@ -185,7 +201,7 @@ public class AstPlantumlCompiler {
                     label = card.toString();
                 }
             }
-            if (!(fromObj.startsWith("#") || toObj.startsWith("#"))) {
+            if (!(fromObj.startsWith("#") || toObj.startsWith("#")) && !(checkBlacklist(fromObj) || checkBlacklist(toObj))) {
                 connections.add(
                         new PlantumlConnection(
                                 fromObj,
@@ -203,7 +219,7 @@ public class AstPlantumlCompiler {
                     String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
                     // NOTE: a little hack to ignore the basic abstract clafers
                     // this should be configurable
-                    if (!scName.startsWith("#") & (!scName.equals("PowerFeature")) & (!scName.equals("WaveformFeature"))) {
+                    if (!scName.startsWith("#") & !checkBlacklist(scName)) {
                         fromObj = toObj;
                         toObj = scName;
                         connections.add(
@@ -220,13 +236,13 @@ public class AstPlantumlCompiler {
                 }
             }
 
-            connections.addAll(getConcreteConnections(ast.getChildren()));
+            if (level < this.includeLevels) connections.addAll(getConcreteConnections(ast.getChildren(), level + 1));
         }
 
         return connections;
     }
 
-    private ArrayList<PlantumlConnection> getAbstractConnections(List<AstAbstractClafer> abstractClafers) {
+    private ArrayList<PlantumlConnection> getAbstractConnections(List<AstAbstractClafer> abstractClafers, int level) {
         ArrayList<PlantumlConnection> connections = new ArrayList<PlantumlConnection>();
 
         for (AstAbstractClafer ast: abstractClafers) {
@@ -245,7 +261,7 @@ public class AstPlantumlCompiler {
                     fromConn = '*';
                 }
             }
-            if (!(fromObj.startsWith("#") || toObj.startsWith("#"))) {
+            if (!(fromObj.startsWith("#") || toObj.startsWith("#")) && !(checkBlacklist(fromObj) || checkBlacklist(toObj))) {
                 connections.add(
                         new PlantumlConnection(
                                 fromObj,
@@ -261,7 +277,7 @@ public class AstPlantumlCompiler {
                 AstClafer superClafer = ast.getSuperClafer();
                 if (superClafer != null) {
                     String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
-                    if (!scName.startsWith("#")) {
+                    if (!scName.startsWith("#") && !checkBlacklist(scName)) {
                         fromObj = toObj;
                         toObj = scName;
                         connections.add(
@@ -278,16 +294,16 @@ public class AstPlantumlCompiler {
                 }
             }
 
-            connections.addAll(getAbstractConnections(ast.getAbstractChildren()));
-            connections.addAll(getConcreteConnections(ast.getChildren()));
+            if (level < this.includeLevels) connections.addAll(getAbstractConnections(ast.getAbstractChildren(), level + 1));
+            if (level < this.includeLevels) connections.addAll(getConcreteConnections(ast.getChildren(), level + 1));
         }
 
         return connections;
     }
 
     private ArrayList<PlantumlConnection> getConnections(AstModel model) {
-        ArrayList<PlantumlConnection> connections = getAbstractConnections(model.getAbstracts());
-        connections.addAll(getConcreteConnections(model.getChildren()));
+        ArrayList<PlantumlConnection> connections = getAbstractConnections(model.getAbstracts(), 0);
+        connections.addAll(getConcreteConnections(model.getChildren(), 0));
         return connections;
     }
 
@@ -311,10 +327,13 @@ public class AstPlantumlCompiler {
         private boolean includeSuperClafers;
         private int includeLevels;
 
+        private List<String> clafersBlacklist;
+
         public AstPlantumlCompilerBuilder(){
             this.includeConstraints = true;
             this.includeSuperClafers = true;
-            this.includeLevels = -1;
+            this.includeLevels = Integer.MAX_VALUE;
+            this.clafersBlacklist = new ArrayList<String>();
         }
 
         public AstPlantumlCompiler build(){
@@ -333,6 +352,11 @@ public class AstPlantumlCompiler {
 
         public AstPlantumlCompilerBuilder setLevels(int levels){
             this.includeLevels = levels;
+            return this;
+        }
+
+        public AstPlantumlCompilerBuilder setClafersBlacklist(List<String> bl){
+            this.clafersBlacklist = bl;
             return this;
         }
 
@@ -361,6 +385,16 @@ public class AstPlantumlCompiler {
 
                 field = "include.levels";
                 if (result.contains(field)) build.setLevels(Objects.requireNonNull(result.getLong(field)).intValue());
+
+                field = "blacklist.clafers";
+                if (result.contains(field)) {
+                    List<String> blacklist = result.getArrayOrEmpty(field)
+                            .toList()
+                            .stream()
+                            .map(o -> Objects.toString(o, null))
+                            .toList();
+                    build.setClafersBlacklist(blacklist);
+                }
 
                 return build.build();
             }
