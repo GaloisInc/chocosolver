@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.WeakHashMap;
 
 /**
  * Clafer AST to PlantUML
@@ -24,12 +23,15 @@ import java.util.WeakHashMap;
  * TODO: this should be refactored to cut down the code re-use.
  */
 public class AstPlantumlCompiler {
+    private final boolean includeConstraints;
+    private final boolean includeSuperClafers;
+    private final int includeLevels;
+
     public AstPlantumlCompiler(AstPlantumlCompilerBuilder builder){
+        this.includeConstraints = builder.includeConstraints;
+        this.includeSuperClafers = builder.includeSuperClafers;
+        this.includeLevels = builder.includeLevels;
     }
-
-    public AstPlantumlCompiler(){
-    }
-
 
     /**
      * collect all concrete clafers
@@ -49,7 +51,7 @@ public class AstPlantumlCompiler {
             for (AstConstraint constr: ast.getConstraints()) {
                 constrs.add(new PlantumlProperty(constr.toString()));
             }
-            if (constrs.size() > 0){
+            if (constrs.size() > 0 && this.includeConstraints){
                 pgs.add(new PlantumlPropertyGroup("Constraints", constrs.toArray(new PlantumlProperty[0])));
             }
 
@@ -110,7 +112,7 @@ public class AstPlantumlCompiler {
                 pgs.add(new PlantumlPropertyGroup("Attributes", refs.toArray(new PlantumlProperty[0])));
             }
 
-            if (constrs.size() > 0){
+            if (constrs.size() > 0 && this.includeConstraints){
                 pgs.add(new PlantumlPropertyGroup("Constraints", constrs.toArray(new PlantumlProperty[0])));
             }
 
@@ -195,24 +197,26 @@ public class AstPlantumlCompiler {
                 );
             }
 
-            AstClafer superClafer = ast.getSuperClafer();
-            if (superClafer != null) {
-                String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
-                // NOTE: a little hack to ignore the basic abstract clafers
-                // this should be configurable
-                if (!scName.startsWith("#") & (!scName.equals("PowerFeature")) & (!scName.equals("WaveformFeature"))) {
-                    fromObj = toObj;
-                    toObj = scName;
-                    connections.add(
-                            new PlantumlConnection(
-                                    fromObj,
-                                    toObj,
-                                    '.',
-                                    '>',
-                                    "",
-                                    '.'
-                            )
-                    );
+            if (this.includeSuperClafers) {
+                AstClafer superClafer = ast.getSuperClafer();
+                if (superClafer != null) {
+                    String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
+                    // NOTE: a little hack to ignore the basic abstract clafers
+                    // this should be configurable
+                    if (!scName.startsWith("#") & (!scName.equals("PowerFeature")) & (!scName.equals("WaveformFeature"))) {
+                        fromObj = toObj;
+                        toObj = scName;
+                        connections.add(
+                                new PlantumlConnection(
+                                        fromObj,
+                                        toObj,
+                                        '.',
+                                        '>',
+                                        "",
+                                        '.'
+                                )
+                        );
+                    }
                 }
             }
 
@@ -253,22 +257,24 @@ public class AstPlantumlCompiler {
                 );
             }
 
-            AstClafer superClafer = ast.getSuperClafer();
-            if (superClafer != null) {
-                String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
-                if (!scName.startsWith("#")) {
-                    fromObj = toObj;
-                    toObj = scName;
-                    connections.add(
-                            new PlantumlConnection(
-                                    fromObj,
-                                    toObj,
-                                    '.',
-                                    '>',
-                                    "",
-                                    '.'
-                            )
-                    );
+            if (this.includeSuperClafers) {
+                AstClafer superClafer = ast.getSuperClafer();
+                if (superClafer != null) {
+                    String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
+                    if (!scName.startsWith("#")) {
+                        fromObj = toObj;
+                        toObj = scName;
+                        connections.add(
+                                new PlantumlConnection(
+                                        fromObj,
+                                        toObj,
+                                        '.',
+                                        '>',
+                                        "",
+                                        '.'
+                                )
+                        );
+                    }
                 }
             }
 
@@ -301,20 +307,34 @@ public class AstPlantumlCompiler {
      */
     public static class AstPlantumlCompilerBuilder{
 
-        private final boolean includeConstraints;
-        private final boolean includeSuperClafers;
-        private final int printLevels;
+        private boolean includeConstraints;
+        private boolean includeSuperClafers;
+        private int includeLevels;
 
         public AstPlantumlCompilerBuilder(){
             this.includeConstraints = true;
             this.includeSuperClafers = true;
-            this.printLevels = -1;
+            this.includeLevels = -1;
         }
 
         public AstPlantumlCompiler build(){
             return new AstPlantumlCompiler(this);
         }
 
+        public AstPlantumlCompilerBuilder setIncludeConstraints(boolean includeConstraints){
+            this.includeConstraints = includeConstraints;
+            return this;
+        }
+
+        public AstPlantumlCompilerBuilder setIncludeSuperClafers(boolean includeSuperClafers){
+            this.includeSuperClafers = includeSuperClafers;
+            return this;
+        }
+
+        public AstPlantumlCompilerBuilder setLevels(int levels){
+            this.includeLevels = levels;
+            return this;
+        }
 
         /**
          * read builder from an input toml file (null returns defaults)
@@ -324,12 +344,25 @@ public class AstPlantumlCompiler {
          */
         static public AstPlantumlCompiler buildFromToml(File tomlFile) throws IOException {
             if (tomlFile == null) {
-                return new AstPlantumlCompiler();
+                return new AstPlantumlCompiler(new AstPlantumlCompilerBuilder());
             } else {
+                // TODO: Toml4J seems to do better error checking than this
                 Path source = Paths.get(tomlFile.toURI());
                 TomlParseResult result = Toml.parse(source);
                 result.errors().forEach(error -> System.err.println(error.toString()));
-                return new AstPlantumlCompiler();
+
+                AstPlantumlCompilerBuilder build = new AstPlantumlCompilerBuilder();
+
+                String field = "include.super_clafers";
+                if (result.contains(field)) build.setIncludeSuperClafers(Boolean.TRUE.equals(result.getBoolean(field)));
+
+                field = "include.constraints";
+                if (result.contains(field)) build.setIncludeConstraints(Boolean.TRUE.equals(result.getBoolean(field)));
+
+                field = "include.levels";
+                if (result.contains(field)) build.setLevels(Objects.requireNonNull(result.getLong(field)).intValue());
+
+                return build.build();
             }
         }
     }
