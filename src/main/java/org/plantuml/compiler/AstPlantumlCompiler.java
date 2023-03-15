@@ -3,7 +3,13 @@ package org.plantuml.compiler;
 import org.clafer.ast.*;
 import org.plantuml.ast.*;
 import org.sysml.compiler.SysmlCompilerUtils;
+import org.tomlj.Toml;
+import org.tomlj.TomlParseResult;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +24,13 @@ import java.util.WeakHashMap;
  * TODO: this should be refactored to cut down the code re-use.
  */
 public class AstPlantumlCompiler {
+    public AstPlantumlCompiler(AstPlantumlCompilerBuilder builder){
+    }
+
+    public AstPlantumlCompiler(){
+    }
+
+
     /**
      * collect all concrete clafers
      * @param concreteClafers concreteClafers held in a claferModel
@@ -279,5 +292,45 @@ public class AstPlantumlCompiler {
         return new PlantumlProgram(
            objs.toArray(new PlantumlObject[0]), conns.toArray(new PlantumlConnection[0])
         );
+    }
+
+
+    /**
+     * builder class to configure the Compiler
+     * we anticipate a lot of options here, so we use a builder
+     */
+    public static class AstPlantumlCompilerBuilder{
+
+        private final boolean includeConstraints;
+        private final boolean includeSuperClafers;
+        private final int printLevels;
+
+        public AstPlantumlCompilerBuilder(){
+            this.includeConstraints = true;
+            this.includeSuperClafers = true;
+            this.printLevels = -1;
+        }
+
+        public AstPlantumlCompiler build(){
+            return new AstPlantumlCompiler(this);
+        }
+
+
+        /**
+         * read builder from an input toml file (null returns defaults)
+         * @param tomlFile config file
+         * @return a compiler object
+         * @throws IOException
+         */
+        static public AstPlantumlCompiler buildFromToml(File tomlFile) throws IOException {
+            if (tomlFile == null) {
+                return new AstPlantumlCompiler();
+            } else {
+                Path source = Paths.get(tomlFile.toURI());
+                TomlParseResult result = Toml.parse(source);
+                result.errors().forEach(error -> System.err.println(error.toString()));
+                return new AstPlantumlCompiler();
+            }
+        }
     }
 }

@@ -28,6 +28,7 @@ public class Main
                 accepts( "noprint", "Don't print the instances to the console or a file");
                 accepts( "output", "Output instances to the given file." ).withRequiredArg().ofType( File.class ).describedAs( "text file" );
                 accepts( "plantuml", "Print the clafer model as PlantUML" );
+                accepts( "plantuml-config", "TOML configuration file for Clafer->PlantUML compiler" );
                 accepts( "prettify", "Use simple and pretty output format (not formal)." );
                 accepts( "repl", "Run in REPL (interactive) mode." );
                 accepts( "scope", "Override the default global scope value." ).withRequiredArg().ofType( Integer.class );

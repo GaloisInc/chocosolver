@@ -70,8 +70,11 @@ public class Normal {
         }
 
         if (plantuml) {
+            File plantumlConfigFile = (File) options.valueOf("plantuml-config");
             AstModel top = javascriptFile.getModel();
-            AstPlantumlCompiler compiler = new AstPlantumlCompiler();
+            AstPlantumlCompiler compiler = AstPlantumlCompiler
+                    .AstPlantumlCompilerBuilder
+                    .buildFromToml(plantumlConfigFile);
             PlantumlProgram prog = compiler.compile(top);
             PlantumlPrinter pprinter = new PlantumlPrinter(outStream);
             pprinter.visit(prog, "");
