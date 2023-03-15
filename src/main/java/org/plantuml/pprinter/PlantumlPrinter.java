@@ -22,8 +22,8 @@ public class PlantumlPrinter implements PlantumlExprVisitor<String, Void> {
     @Override
     public Void visit(PlantumlProgram ast, String indent) throws IOException {
         this.out.append(indent).append("@startuml").append("\n");
-        this.out.append("' See https://plantuml-documentation.readthedocs.io/en/latest/diagrams/index.html");
-        this.out.append("' for adding skin params and definining custom templates");
+        // @podrmic: here we want to insert an optional string from the config file
+        // so probably in toml: `plantuml_string = "include sometemplate" etc
         for (PlantumlObject obj: ast.getObjects()){
             obj.accept(this, indent + indentBase);
         }

@@ -6,6 +6,7 @@ public class PlantumlProperty implements PlantumlExpr {
     private final String prop;
 
     public PlantumlProperty(String prop) {
+        // NOTE: do you want to make this configurable though the TOML file? That might be a stretch...
         prop = prop.replace("c0_", ""); // Remove "c0_" prefix (instances)
         prop = prop.replace("this . ", ""); // Remove "this ." prefix (self attributes)
         prop = prop.replace(" . ref", ""); // Remove "ref ." prefix (type defs)

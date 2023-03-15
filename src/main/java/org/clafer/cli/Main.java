@@ -20,6 +20,7 @@ public class Main
                 accepts( "file", "Input file in .cfr or .js format" ).withRequiredArg().ofType( File.class )
                     .describedAs( "Clafer model file (.cfr) or Clafer Javascript file (.js)." );
                 accepts( "help", "Show help.").forHelp();
+                accepts( "config", "Config file in .toml format" ).withRequiredArg().ofType( File.class );
                 accepts( "maxint", "Specify maximum integer value." ).withRequiredArg().ofType( Integer.class );
                 accepts( "minint", "Specify minimum integer value." ).withRequiredArg().ofType( Integer.class );
                 accepts( "moo", "Run in multi-objective optimization mode." );
