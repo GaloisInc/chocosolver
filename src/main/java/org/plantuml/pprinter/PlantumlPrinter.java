@@ -22,6 +22,8 @@ public class PlantumlPrinter implements PlantumlExprVisitor<String, Void> {
     @Override
     public Void visit(PlantumlProgram ast, String indent) throws IOException {
         this.out.append(indent).append("@startuml").append("\n");
+        this.out.append("' See https://plantuml-documentation.readthedocs.io/en/latest/diagrams/index.html");
+        this.out.append("' for adding skin params and definining custom templates");
         for (PlantumlObject obj: ast.getObjects()){
             obj.accept(this, indent + indentBase);
         }

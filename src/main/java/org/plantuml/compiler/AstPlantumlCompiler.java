@@ -36,14 +36,20 @@ public class AstPlantumlCompiler {
             for (AstConstraint constr: ast.getConstraints()) {
                 constrs.add(new PlantumlProperty(constr.toString()));
             }
-
             if (constrs.size() > 0){
                 pgs.add(new PlantumlPropertyGroup("Constraints", constrs.toArray(new PlantumlProperty[0])));
             }
 
+            // Display inheritance as a style notation
+            AstClafer superClafer = ast.getSuperClafer();
+            String scName = "";
+            if (superClafer != null & !SysmlCompilerUtils.getPropertyId(superClafer.getName()).startsWith("#")) {
+                scName = " <<" + SysmlCompilerUtils.getPropertyId(superClafer.getName()) + ">>";
+            }
+
             // create an object and add it
             PlantumlObject obj = new PlantumlObject(
-                    SysmlCompilerUtils.getPropertyId(ast.getName()),
+                    SysmlCompilerUtils.getPropertyId(ast.getName() + scName),
                     pgs.toArray(new PlantumlPropertyGroup[0])
             );
 
@@ -138,20 +144,29 @@ public class AstPlantumlCompiler {
             char fromConn = '-';
             if (ast.getParent().hasGroupCard()){
                 if (ast.getParent().getGroupCard().toString().equals("1")){
+                    // This is an OR (exactly one)
                     fromConn = '+';
                 } else if (ast.getParent().getGroupCard().toString().equals("1..*")) {
-                    fromConn = '*';
+                    // This is an Alternative (1 or more)
+                    fromConn = ')';
                 }
-            }
-            if (card.toString().equals("0..1")){
-                toConn = 'o';
-            } else if (card.toString().equals("1")) {
-               toConn = '*';
+                // Common setting
+                toConn = '-';
+                if (!card.toString().equals("0..1")){
+                    label = card.toString();
+                }
             } else {
-                if (card.toString().startsWith("0")) {
+                // No Alternative/OR
+                if (card.toString().equals("0..1")){
                     toConn = 'o';
+                } else if (card.toString().equals("1")) {
+                    toConn = '*';
+                } else {
+                    if (card.toString().startsWith("0")) {
+                        toConn = 'o';
+                    }
+                    label = card.toString();
                 }
-                label = card.toString();
             }
             if (!(fromObj.startsWith("#") || toObj.startsWith("#"))) {
                 connections.add(
@@ -168,7 +183,8 @@ public class AstPlantumlCompiler {
             AstClafer superClafer = ast.getSuperClafer();
             if (superClafer != null) {
                 String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
-                if (!scName.startsWith("#")) {
+                // NOTE: a little hack to ignore the basic abstract clafers
+                if (!scName.startsWith("#") & (!scName.equals("PowerFeature")) & (!scName.equals("WaveformFeature"))) {
                     fromObj = toObj;
                     toObj = scName;
                     connections.add(
