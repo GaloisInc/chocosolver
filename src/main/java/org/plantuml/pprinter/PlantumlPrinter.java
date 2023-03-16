@@ -28,9 +28,8 @@ public class PlantumlPrinter implements PlantumlExprVisitor<String, Void> {
     public PlantumlPrinter(Appendable out, File tomlFile) throws IOException {
         this.out = out;
         this.indentBase = "  ";
-        if (tomlFile == null) {
-            this.header = "";
-        } else {
+        this.header = "";
+        if (tomlFile != null) {
             // NOTE: silly that we are redoing what is done in AstPlantumlCompilerBuilder to get the header
             Path source = Paths.get(tomlFile.toURI());
             TomlParseResult result = Toml.parse(source);
