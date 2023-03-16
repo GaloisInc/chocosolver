@@ -76,7 +76,7 @@ public class Normal {
                     .AstPlantumlCompilerBuilder
                     .buildFromToml(plantumlConfigFile);
             PlantumlProgram prog = compiler.compile(top);
-            PlantumlPrinter pprinter = new PlantumlPrinter(outStream);
+            PlantumlPrinter pprinter = new PlantumlPrinter(outStream, plantumlConfigFile);
             pprinter.visit(prog, "");
             if (dataStream != null){
                 dataStream.close();

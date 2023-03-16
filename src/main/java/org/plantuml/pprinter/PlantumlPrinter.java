@@ -1,8 +1,13 @@
 package org.plantuml.pprinter;
 
 import org.plantuml.ast.*;
+import org.tomlj.Toml;
+import org.tomlj.TomlParseResult;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * PlantUML -> Text
@@ -12,18 +17,35 @@ import java.io.IOException;
 public class PlantumlPrinter implements PlantumlExprVisitor<String, Void> {
     private final String indentBase;
     private final Appendable out;
+    private String header;
 
-    public PlantumlPrinter(Appendable out) {
+    /**
+     * Initialize a printer
+     * @param out appendable stream
+     * @param tomlFile config file
+     * @throws IOException
+     */
+    public PlantumlPrinter(Appendable out, File tomlFile) throws IOException {
         this.out = out;
         this.indentBase = "  ";
+        if (tomlFile == null) {
+            this.header = "";
+        } else {
+            // NOTE: silly that we are redoing what is done in AstPlantumlCompilerBuilder to get the header
+            Path source = Paths.get(tomlFile.toURI());
+            TomlParseResult result = Toml.parse(source);
+            result.errors().forEach(error -> System.err.println(error.toString()));
+            String field = "include.header";
+            if (result.contains(field)) {
+                this.header = result.getString(field);
+            }
+        }
     }
 
     // implement the visitor
     @Override
     public Void visit(PlantumlProgram ast, String indent) throws IOException {
-        this.out.append(indent).append("@startuml").append("\n");
-        // @podrmic: here we want to insert an optional string from the config file
-        // so probably in toml: `plantuml_string = "include sometemplate" etc
+        this.out.append(indent).append("@startuml").append("\n").append(this.header).append("\n");
         for (PlantumlObject obj: ast.getObjects()){
             obj.accept(this, indent + indentBase);
         }
