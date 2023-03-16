@@ -1,0 +1,10 @@
+stages:
+  - build
+  - test
+  - deploy
+
+build_image:
+  stage: build
+  script:
+    - docker run -it --rm --name my-maven-project -v "$(pwd)":/usr/src/chocosolver -w /usr/src/chocosolver maven:3.6-jdk-11 mvn clean install
+
