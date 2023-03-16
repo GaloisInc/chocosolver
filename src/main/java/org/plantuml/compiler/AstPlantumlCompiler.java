@@ -428,11 +428,12 @@ public class AstPlantumlCompiler {
 
                 field = "blacklist.clafers";
                 if (result.contains(field)) {
-                    List<String> blacklist = result.getArrayOrEmpty(field)
-                            .toList()
-                            .stream()
-                            .map(o -> Objects.toString(o, null))
-                            .toList();
+                    List<String> blacklist = new ArrayList<>();
+                    for (Object o : result.getArrayOrEmpty(field)
+                            .toList()) {
+                        String s = Objects.toString(o, null);
+                        blacklist.add(s);
+                    }
                     build.setClafersBlacklist(blacklist);
                 }
 
