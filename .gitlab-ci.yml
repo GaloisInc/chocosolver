@@ -1,0 +1,47 @@
+stages:
+  - build
+  - test
+  - deploy
+
+image: maven:3.6-jdk-11
+
+before_script:
+  - export PATH="$PWD/clafer-tools-0.4.5:$PATH"
+
+build_package:
+  stage: build
+  tags: ["docker"]
+  script:
+    - mvn package -DskipTests
+  artifacts:
+    when: always
+    paths:
+      - target/chocosolver-0.4.4-jar-with-dependencies.jar
+    expire_in: 1 week
+
+test_image:
+  stage: test
+  needs:
+    job: build_package
+    artifacts: true
+  script:
+    - wget --no-check-certificate https://gsd.uwaterloo.ca/clafer-tools-bin/clafer-tools-0.4.5-linux-x86_64.zip
+    - unzip clafer-tools-0.4.5-linux-x86_64.zip
+    - wget https://github.com/plantuml/plantuml/releases/download/v1.2023.4/plantuml-1.2023.4.jar
+    - apt-get update && apt-get install -y graphviz
+    - |
+      for f in examples/*.cfr
+      do 
+        echo "Processing $f"
+        java -jar target/chocosolver-0.4.4-jar-with-dependencies.jar --plantuml --file $f --output $f.plantuml
+        echo "Rendering $f.plantuml"
+        java -jar plantuml-1.2023.4.jar $f.plantuml
+      done
+  artifacts:
+    when: always
+    paths:
+      - ./examples/*.plantuml
+      - ./examples/*.png
+    expire_in: 1 week
+
+
