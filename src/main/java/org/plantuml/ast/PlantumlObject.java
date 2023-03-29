@@ -4,10 +4,15 @@ import java.io.IOException;
 
 public class PlantumlObject implements PlantumlExpr, PlantumlId {
     private final String name;
+    private final String alias;
+    private final String parent;
+
     private final PlantumlPropertyGroup[] propertyGroups;
 
-    public PlantumlObject(String name, PlantumlPropertyGroup[] propertyGroups) {
+    public PlantumlObject(String name, String alias, String parent, PlantumlPropertyGroup[] propertyGroups) {
         this.name = name;
+        this.alias = alias;
+        this.parent = parent;
         this.propertyGroups = propertyGroups;
     }
 
@@ -18,6 +23,14 @@ public class PlantumlObject implements PlantumlExpr, PlantumlId {
     @Override
     public String getName() {
         return name;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public String getParent() {
+        return parent;
     }
 
     @Override

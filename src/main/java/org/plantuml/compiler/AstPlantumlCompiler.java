@@ -97,12 +97,14 @@ public class AstPlantumlCompiler {
             AstClafer superClafer = ast.getSuperClafer();
             String scName = "";
             if (superClafer != null && !SysmlCompilerUtils.getPropertyId(superClafer.getName()).startsWith("#") && this.includeSuperClafersComponents) {
-                scName = " <<" + SysmlCompilerUtils.getPropertyId(superClafer.getName()) + ">>";
+                scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
             }
 
             // create an object and add it
             PlantumlObject obj = new PlantumlObject(
-                    SysmlCompilerUtils.getPropertyId(ast.getName() + scName),
+                    SysmlCompilerUtils.getPropertyId(ast.getName()),
+                    SysmlCompilerUtils.getPropertyAlias(ast.getName()),
+                    scName,
                     pgs.toArray(new PlantumlPropertyGroup[0])
             );
 
@@ -156,6 +158,8 @@ public class AstPlantumlCompiler {
             // create an object and add it
             PlantumlObject obj = new PlantumlObject(
                     SysmlCompilerUtils.getPropertyId(ast.getName()),
+                    SysmlCompilerUtils.getPropertyAlias(ast.getName()),
+                    null,
                     pgs.toArray(new PlantumlPropertyGroup[0])
             );
 
