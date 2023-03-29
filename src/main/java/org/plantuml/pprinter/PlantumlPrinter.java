@@ -58,7 +58,23 @@ public class PlantumlPrinter implements PlantumlExprVisitor<String, Void> {
 
     @Override
     public Void visit(PlantumlObject plantumlObject, String s) throws IOException {
-        this.out.append(s).append("object ").append(plantumlObject.getName());
+        this.out.append(s).append("object ");
+
+        String alias = plantumlObject.getAlias();
+        String parent = plantumlObject.getParent();
+
+        if (alias != null) {
+            this.out.append('"').append(alias).append('"').append(" as ");
+        }
+
+        this.out.append(plantumlObject.getName());
+
+        if (parent != null ) {
+            if (!parent.isEmpty()) {
+                this.out.append("<<").append(parent).append(">>");
+            }
+        }
+
         if (plantumlObject.getPropertyGroups().length > 0) {
             this.out.append(" {\n");
             for (PlantumlPropertyGroup grp: plantumlObject.getPropertyGroups()){
