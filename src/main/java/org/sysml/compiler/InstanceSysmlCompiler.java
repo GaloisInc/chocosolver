@@ -13,6 +13,9 @@ import java.util.regex.Pattern;
 
 public class InstanceSysmlCompiler {
 
+    // it will use the FIRST clafer named SysmlProperty
+    private final String baseSysmlClafer = "SysmlProperty_0";
+
     private ArrayList<String> processedClafers;
 
     public InstanceSysmlCompiler(){
@@ -58,9 +61,9 @@ public class InstanceSysmlCompiler {
         // get the property name
         String propName = "";
         String[] superTypes = new String[0];
-        if (hierarchy.contains("SysmlProperty")) {
-            propName = ((String) hierarchy.get(hierarchy.indexOf("SysmlProperty") - 1)).toLowerCase();
-            superTypes = Arrays.copyOfRange(superClafers, 0, hierarchy.indexOf("SysmlProperty")-1);
+        if (hierarchy.contains(baseSysmlClafer)) {
+            propName = ((String) hierarchy.get(hierarchy.indexOf(baseSysmlClafer) - 1)).toLowerCase();
+            superTypes = Arrays.copyOfRange(superClafers, 0, hierarchy.indexOf(baseSysmlClafer)-1);
         } else {
             propName = "unk";
         }
