@@ -2,7 +2,7 @@ package org.plantuml.compiler;
 
 import org.clafer.ast.*;
 import org.plantuml.ast.*;
-import org.sysml.compiler.SysmlCompilerUtils;
+import org.plantuml.compiler.PlantumlCompilerUtils;
 import org.tomlj.Toml;
 import org.tomlj.TomlParseResult;
 
@@ -96,14 +96,14 @@ public class AstPlantumlCompiler {
             // NOTE: this could be made optional
             AstClafer superClafer = ast.getSuperClafer();
             String scName = "";
-            if (superClafer != null && !SysmlCompilerUtils.getPropertyId(superClafer.getName()).startsWith("#") && this.includeSuperClafersComponents) {
-                scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
+            if (superClafer != null && !PlantumlCompilerUtils.getPropertyId(superClafer.getName()).startsWith("#") && this.includeSuperClafersComponents) {
+                scName = PlantumlCompilerUtils.getPropertyId(superClafer.getName());
             }
 
             // create an object and add it
             PlantumlObject obj = new PlantumlObject(
-                    SysmlCompilerUtils.getPropertyId(ast.getName()),
-                    SysmlCompilerUtils.getPropertyAlias(ast.getName()),
+                    PlantumlCompilerUtils.getPropertyId(ast.getName()),
+                    PlantumlCompilerUtils.getPropertyAlias(ast.getName()),
                     scName,
                     pgs.toArray(new PlantumlPropertyGroup[0])
             );
@@ -157,8 +157,8 @@ public class AstPlantumlCompiler {
 
             // create an object and add it
             PlantumlObject obj = new PlantumlObject(
-                    SysmlCompilerUtils.getPropertyId(ast.getName()),
-                    SysmlCompilerUtils.getPropertyAlias(ast.getName()),
+                    PlantumlCompilerUtils.getPropertyId(ast.getName()),
+                    PlantumlCompilerUtils.getPropertyAlias(ast.getName()),
                     null,
                     pgs.toArray(new PlantumlPropertyGroup[0])
             );
@@ -231,8 +231,8 @@ public class AstPlantumlCompiler {
             if (ast.getRef() != null) {
                 continue;
             }
-            String fromObj = SysmlCompilerUtils.getPropertyId(ast.getParent().getName());
-            String toObj = SysmlCompilerUtils.getPropertyId(ast.getName());
+            String fromObj = PlantumlCompilerUtils.getPropertyId(ast.getParent().getName());
+            String toObj = PlantumlCompilerUtils.getPropertyId(ast.getName());
 
             Card card = ast.getCard();
             boolean hasGroupCard = ast.getParent().hasGroupCard();
@@ -256,7 +256,7 @@ public class AstPlantumlCompiler {
             if (this.includeSuperClafersConnections) {
                 AstClafer superClafer = ast.getSuperClafer();
                 if (superClafer != null) {
-                    String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
+                    String scName = PlantumlCompilerUtils.getPropertyId(superClafer.getName());
                     if (checkClaferName(scName)) {
                         fromObj = toObj;
                         toObj = scName;
@@ -287,8 +287,8 @@ public class AstPlantumlCompiler {
             if (ast.getRef() != null) continue;
 
             // collect the connection labels
-            String fromObj = SysmlCompilerUtils.getPropertyId(ast.getParent().getName());
-            String toObj = SysmlCompilerUtils.getPropertyId(ast.getName());
+            String fromObj = PlantumlCompilerUtils.getPropertyId(ast.getParent().getName());
+            String toObj = PlantumlCompilerUtils.getPropertyId(ast.getName());
             String label = "";
             char toConn = '*';
             char fromConn = getStartArrowhead(ast.getParent().hasGroupCard(), ast.getParent().getGroupCard());
@@ -308,7 +308,7 @@ public class AstPlantumlCompiler {
             if (this.includeSuperClafersConnections) {
                 AstClafer superClafer = ast.getSuperClafer();
                 if (superClafer != null) {
-                    String scName = SysmlCompilerUtils.getPropertyId(superClafer.getName());
+                    String scName = PlantumlCompilerUtils.getPropertyId(superClafer.getName());
                     if (!scName.startsWith("#") && !checkBlacklist(scName)) {
                         fromObj = toObj;
                         toObj = scName;
