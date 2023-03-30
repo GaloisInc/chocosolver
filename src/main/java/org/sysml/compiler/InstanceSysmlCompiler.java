@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public class InstanceSysmlCompiler {
 
     // it will use the FIRST clafer named SysmlProperty
-    private final String baseSysmlClafer = "SysmlProperty_0";
+    public final String baseSysmlClafer = "SysmlProperty";
 
     private ArrayList<String> processedClafers;
 
