@@ -23,7 +23,7 @@ build_package:
   stage: build
   tags: ["docker"]
   script:
-    - mvn package -DskipTests
+    - mvn package
   artifacts:
     when: always
     paths:

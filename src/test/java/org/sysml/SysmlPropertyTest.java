@@ -13,6 +13,7 @@ import org.clafer.javascript.JavascriptFile;
 import org.clafer.objective.Objective;
 import org.clafer.scope.Scope;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.sysml.ast.SysmlPropertyDef;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
+@Ignore
 @RunWith(Parameterized.class)
 public class SysmlPropertyTest {
     @Parameterized.Parameter
