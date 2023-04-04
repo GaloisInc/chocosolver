@@ -107,7 +107,7 @@ public class Normal {
                 ++index;
             } else {
                 if (sysml) {
-                    outStream.append("package Architecture {\n");
+                    outStream.append("package Instance" + (++index) + "{\n");
                     outStream.append("    import ScalarValues::*;\n");
                     AstModel top = javascriptFile.getModel();
                     SysmlPrinter pprinter = new SysmlPrinter(outStream);
