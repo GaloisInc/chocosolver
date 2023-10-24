@@ -21,7 +21,7 @@ prepare_environment:
 
 build_package:
   stage: build
-  tags: ["docker"]
+  tags: ["stardust"]
   script:
     - mvn package
   artifacts:
