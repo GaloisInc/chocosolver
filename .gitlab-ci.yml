@@ -5,6 +5,10 @@ stages:
 
 image: maven:3.6-jdk-11
 
+cache:
+  paths:
+    - .m2/repository
+
 before_script:
   - export PATH="$PWD/clafer-tools-0.4.5:$PATH"
 
@@ -76,3 +80,11 @@ test_plantuml_export:
       - ./examples/*.sysml
       - ./examples/*.png
     expire_in: 1 week
+
+deploy_job:
+  stage: deploy
+  script:
+    - 'echo "Deploying the project..."'
+    - 'curl --upload-file ./target/your-artifact-name.jar "http://your-deployment-server/upload"'
+  only:
+    - tags
