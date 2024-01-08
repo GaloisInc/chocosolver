@@ -84,7 +84,7 @@ test_plantuml_export:
 deploy_job:
   stage: deploy
   script:
-    - 'echo "Deploying the project..."'
-    - 'curl --upload-file ./target/your-artifact-name.jar "http://your-deployment-server/upload"'
+    - 'echo "Deploying the project to GitLab Package Registry..."'
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file ./target/chocosolver-0.4.4-jar-with-dependencies.jar "https://gitlab-ext.galois.com/api/v4/projects/$CI_PROJECT_ID/packages/maven/"'
   only:
     - tags
