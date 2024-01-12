@@ -5,10 +5,6 @@ stages:
 
 image: maven:3.6-jdk-11
 
-cache:
-  paths:
-    - .m2/repository
-
 before_script:
   - export PATH="$PWD/clafer-tools-0.4.5:$PATH"
 
@@ -83,6 +79,11 @@ test_plantuml_export:
 
 deploy_job:
   stage: deploy
+  needs:
+    - job: build_package
+      artifacts: true
+    - job: prepare_environment
+      artifacts: true
   script:
     - 'echo "Deploying the project to GitLab Package Registry..."'
     - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file ./target/chocosolver-0.4.4-jar-with-dependencies.jar "https://gitlab-ext.galois.com/api/v4/projects/$CI_PROJECT_ID/packages/maven/"'
