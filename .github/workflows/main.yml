@@ -6,12 +6,17 @@ name: CI
 on:
   push:
 
+env:
+  PATH: "/opt/clafer-tools-0.4.5:$PATH"
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build_package:
+    name: Builld chocosolver package
     runs-on: ubuntu-20.04
     steps:
       #### This step is only needed for GHA local runner, act: https://github.com/nektos/act
+      ### That is because act ubuntu image does not have mvn installed, but the github one does
       # - name: Install curl (for nektos/act local CI testing)
       #   run: apt-get update && apt-get install build-essential curl pkg-config openssl -y
       # - name: Download Maven
@@ -35,6 +40,28 @@ jobs:
       - run: mkdir staging && cp target/*.jar staging
       - uses: actions/upload-artifact@v4
         with:
-          name: Package
+          name: Chocosolver-0.4.4
           path: staging
-    
+
+  test_sysml_export:
+    name: Test SysMLv2 export
+    needs: build_package
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Install clafer tools
+        run: |
+          wget --no-check-certificate https://gsd.uwaterloo.ca/clafer-tools-bin/clafer-tools-0.4.5-linux-x86_64.zip
+          unzip clafer-tools-0.4.5-linux-x86_64.zip
+          mv clafer-tools-0.4.5 /opt/clafer-tools-0.4.5
+      - name: Process SysML examples
+        run: |
+          for f in examples/sysml-samples/*.cfr
+          do
+            echo "Processing $f"
+            java -jar staging/chocosolver-0.4.4-jar-with-dependencies.jar --sysml --file $f --output $f.sysml
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+            name: SysML_generated
+            path: examples/sysml-samples
+            retention-days: 1
