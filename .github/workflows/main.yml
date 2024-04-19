@@ -46,6 +46,10 @@ jobs:
     needs: build_package
     runs-on: ubuntu-20.04
     steps:
+      - name: Download Chocosolver package
+        uses: actions/download-artifact@v4
+        with:
+          name: chocosolver-release
       - name: Install clafer tools
         run: |
           wget --no-check-certificate https://gsd.uwaterloo.ca/clafer-tools-bin/clafer-tools-0.4.5-linux-x86_64.zip
@@ -70,16 +74,20 @@ jobs:
     needs: build_package
     runs-on: ubuntu-20.04
     steps:
-      # - name: Install clafer tools
-      #   run: |
-      #     wget --no-check-certificate https://gsd.uwaterloo.ca/clafer-tools-bin/clafer-tools-0.4.5-linux-x86_64.zip
-      #     unzip clafer-tools-0.4.5-linux-x86_64.zip
-      #     mv clafer-tools-0.4.5 /opt/clafer-tools-0.4.5
-      #     echo "/opt/clafer-tools-0.4.5" >> $GITHUB_PATH
-      # - name: Install PlantUML
-      #   run: |
-      #     wget https://github.com/plantuml/plantuml/releases/download/v1.2023.4/plantuml-1.2023.4.jar
-      #     apt-get update && apt-get install -y graphviz
+      - name: Download Chocosolver package
+        uses: actions/download-artifact@v4
+        with:
+          name: chocosolver-release
+      - name: Install clafer tools
+        run: |
+          wget --no-check-certificate https://gsd.uwaterloo.ca/clafer-tools-bin/clafer-tools-0.4.5-linux-x86_64.zip
+          unzip clafer-tools-0.4.5-linux-x86_64.zip
+          mv clafer-tools-0.4.5 /opt/clafer-tools-0.4.5
+          echo "/opt/clafer-tools-0.4.5" >> $GITHUB_PATH
+      - name: Install PlantUML
+        run: |
+          wget https://github.com/plantuml/plantuml/releases/download/v1.2023.4/plantuml-1.2023.4.jar
+          apt-get update && apt-get install -y graphviz
       - name: Process SysML examples
         run: |
           for f in examples/**/*.cfr
