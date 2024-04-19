@@ -51,7 +51,7 @@ jobs:
           wget --no-check-certificate https://gsd.uwaterloo.ca/clafer-tools-bin/clafer-tools-0.4.5-linux-x86_64.zip
           unzip clafer-tools-0.4.5-linux-x86_64.zip
           mv clafer-tools-0.4.5 /opt/clafer-tools-0.4.5
-          echo "/opt/clafer-tools-0.4.5" >> $GITHUB_PATH
+#          echo "/opt/clafer-tools-0.4.5" >> $GITHUB_PATH
       - name: Process SysML examples
         run: |
           for f in examples/sysml-samples/*.cfr
