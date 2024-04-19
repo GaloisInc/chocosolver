@@ -58,6 +58,7 @@ jobs:
           mv clafer-tools-0.4.5 /opt/clafer-tools-0.4.5
           echo "/opt/clafer-tools-0.4.5" >> $GITHUB_PATH
       - name: Process SysML examples
+        shell: bash
         run: |
           for f in examples/sysml-samples/*.cfr
           do
@@ -81,6 +82,7 @@ jobs:
           name: chocosolver-release
           path: /tmp/chocosolver-release
       - name: Install clafer tools
+        shell: bash
         run: |
           wget --no-check-certificate https://gsd.uwaterloo.ca/clafer-tools-bin/clafer-tools-0.4.5-linux-x86_64.zip
           unzip clafer-tools-0.4.5-linux-x86_64.zip
@@ -89,7 +91,10 @@ jobs:
       - name: Install PlantUML
         run: |
           wget https://github.com/plantuml/plantuml/releases/download/v1.2023.4/plantuml-1.2023.4.jar
-          apt-get update && apt-get install -y graphviz
+      - name: Install graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install graphviz
       - name: Process SysML examples
         run: |
           for f in examples/**/*.cfr
