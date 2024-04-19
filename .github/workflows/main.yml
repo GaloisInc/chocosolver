@@ -99,7 +99,7 @@ jobs:
           sudo apt-get install graphviz
       - name: Process SysML examples
         run: |
-          for f in examples/**/*.cfr
+          for f in examples/**.cfr
           do
             echo "Processing $f"
             java -jar /tmp/chocosolver-release/chocosolver-0.4.4-jar-with-dependencies.jar --plantuml --file $f --output $f.plantuml
